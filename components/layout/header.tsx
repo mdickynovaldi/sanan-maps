@@ -79,6 +79,7 @@ export function Header({ activeNav = "explore" }: HeaderProps) {
           )}
           {/* Mobile menu button */}
           <Button
+            type="button"
             variant="ghost"
             size="icon"
             className="md:hidden"

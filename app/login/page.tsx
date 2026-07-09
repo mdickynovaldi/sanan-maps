@@ -1,12 +1,23 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
-import { signIn, signInWithGoogle } from "@/lib/actions/auth";
+import { signIn } from "@/lib/actions/auth";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageInner />
+    </Suspense>
+  );
+}
+
+function LoginPageInner() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") ?? "";
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
@@ -93,6 +104,7 @@ export default function LoginPage() {
               )}
 
               <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+                {redirectTo && <input type="hidden" name="redirect" value={redirectTo} />}
                 <div className="flex flex-col gap-2">
                   <label htmlFor="email" className="text-label-caps text-on-surface uppercase">Email Address</label>
                   <input
@@ -137,23 +149,6 @@ export default function LoginPage() {
                   <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </Button>
               </form>
-
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                onClick={async () => {
-                  const result = await signInWithGoogle();
-                  if (!result.success) {
-                    setError(result.error ?? "Google OAuth gagal");
-                    return;
-                  }
-                  if (result.url) window.location.href = result.url;
-                }}
-              >
-                <span className="material-symbols-outlined text-[18px]">login</span>
-                Login dengan Google
-              </Button>
 
               <p className="text-center text-body-sm text-on-surface-variant">
                 Belum punya akun?{" "}

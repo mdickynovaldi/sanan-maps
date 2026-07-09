@@ -3,12 +3,18 @@
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "./auth";
 
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const ALLOWED_AUDIO_TYPES = ["audio/mpeg", "audio/mp3", "audio/wav", "audio/x-wav", "audio/ogg", "audio/mp4", "audio/aac"];
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_AUDIO_SIZE = 10 * 1024 * 1024; // 10MB
 
-export async function uploadImage(
+async function uploadFile(
   formData: FormData,
-  bucket: string = "photos"
+  bucket: string,
+  allowedTypes: string[],
+  maxSize: number,
+  typeErrorMessage: string,
+  fallbackExt: string,
 ): Promise<ActionResult & { url?: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -17,18 +23,16 @@ export async function uploadImage(
   const file = formData.get("file") as File | null;
   if (!file) return { success: false, error: "File tidak ditemukan" };
 
-  // Validate MIME type
-  if (!ALLOWED_TYPES.includes(file.type)) {
-    return { success: false, error: "Format file tidak didukung. Gunakan JPG, PNG, WebP, atau GIF." };
+  if (!allowedTypes.includes(file.type)) {
+    return { success: false, error: typeErrorMessage };
   }
 
-  // Validate size
-  if (file.size > MAX_SIZE) {
-    return { success: false, error: "Ukuran file maksimal 5MB." };
+  if (file.size > maxSize) {
+    return { success: false, error: `Ukuran file maksimal ${Math.round(maxSize / 1024 / 1024)}MB.` };
   }
 
-  // Generate unique filename
-  const ext = file.name.split(".").pop() ?? "jpg";
+  // Nama file unik di folder milik user (sesuai kebijakan RLS storage)
+  const ext = file.name.split(".").pop() ?? fallbackExt;
   const filename = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
   const { error } = await supabase.storage
@@ -44,4 +48,32 @@ export async function uploadImage(
   const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(filename);
 
   return { success: true, url: urlData.publicUrl };
+}
+
+export async function uploadImage(
+  formData: FormData,
+  bucket: string = "photos"
+): Promise<ActionResult & { url?: string }> {
+  return uploadFile(
+    formData,
+    bucket,
+    ALLOWED_IMAGE_TYPES,
+    MAX_IMAGE_SIZE,
+    "Format file tidak didukung. Gunakan JPG, PNG, WebP, atau GIF.",
+    "jpg",
+  );
+}
+
+export async function uploadAudio(
+  formData: FormData,
+  bucket: string = "audio"
+): Promise<ActionResult & { url?: string }> {
+  return uploadFile(
+    formData,
+    bucket,
+    ALLOWED_AUDIO_TYPES,
+    MAX_AUDIO_SIZE,
+    "Format audio tidak didukung. Gunakan MP3, WAV, atau OGG.",
+    "mp3",
+  );
 }

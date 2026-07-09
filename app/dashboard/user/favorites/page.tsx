@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { DashboardNav, userNavItems } from "@/components/layout/dashboard-nav";
 import { createClient } from "@/lib/supabase/client";
 import { toggleFavorite } from "@/lib/actions/favorites";
-import { featuredOutlets } from "@/lib/mock-data";
 
 type FavoriteOutlet = {
   id: string;
@@ -16,64 +15,98 @@ type FavoriteOutlet = {
   slug: string;
   description: string;
   category: string;
-  image: string;
-  rating: number;
+  image: string | null;
+  imageAlt: string | null;
+  rating: number | null;
+};
+
+type FavoriteRow = {
+  id: string;
+  outlet_id: string;
+  outlets: {
+    slug: string;
+    name: string;
+    description: string;
+    outlet_categories: Array<{ categories: { name: string } | null }> | null;
+    reviews: Array<{ rating: number; status: string }> | null;
+    products: Array<{ image_url: string | null; image_alt: string | null }> | null;
+  } | null;
 };
 
 export default function UserFavoritesPage() {
   const [favorites, setFavorites] = useState<FavoriteOutlet[]>([]);
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState<string | null>(null);
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
-  async function loadFavorites() {
+  const loadFavorites = useCallback(async () => {
     setLoading(true);
+    setMessage(null);
     try {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("not logged in");
+      if (!user) {
+        setMessage("Anda perlu masuk untuk melihat outlet favorit.");
+        setFavorites([]);
+        return;
+      }
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("favorites")
-        .select("id, outlet_id, outlets(name, slug, description)")
+        .select(
+          "id, outlet_id, outlets(slug, name, description, outlet_categories(categories(name)), reviews(rating, status), products(image_url, image_alt))",
+        )
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
-      if (data && data.length > 0) {
-        setFavorites(data.map((f: unknown) => {
-          const fav = f as { id: string; outlet_id: string; outlets: { name: string; slug: string; description: string } | null };
-          return {
-            id: fav.id,
-            outlet_id: fav.outlet_id,
-            name: fav.outlets?.name ?? "Outlet",
-            slug: fav.outlets?.slug ?? "",
-            description: fav.outlets?.description ?? "",
-            category: "UMKM",
-            image: "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80",
-            rating: 4.5,
-          };
-        }));
-      } else {
-        throw new Error("empty");
+      if (error) {
+        setMessage(`Gagal memuat favorit: ${error.message}`);
+        setFavorites([]);
+        return;
       }
-    } catch {
-      // Fallback to mock
-      setFavorites(featuredOutlets.map((o) => ({
-        id: String(o.id),
-        outlet_id: String(o.id),
-        name: o.name,
-        slug: o.slug,
-        description: o.description,
-        category: o.category,
-        image: o.image,
-        rating: o.rating,
-      })));
-    }
-    setLoading(false);
-  }
 
-  useEffect(() => { loadFavorites(); }, []);
+      const mapped = ((data ?? []) as unknown as FavoriteRow[])
+        .filter((row) => row.outlets !== null)
+        .map((row) => {
+          const outlet = row.outlets!;
+          const ratings = (outlet.reviews ?? []).filter((r) => r.status === "approved");
+          const rating =
+            ratings.length > 0
+              ? Math.round((ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length) * 10) / 10
+              : null;
+          const photo = (outlet.products ?? []).find((p) => p.image_url)?.image_url ?? null;
+          const photoAlt = (outlet.products ?? []).find((p) => p.image_url)?.image_alt ?? null;
+          return {
+            id: row.id,
+            outlet_id: row.outlet_id,
+            name: outlet.name,
+            slug: outlet.slug,
+            description: outlet.description,
+            category: outlet.outlet_categories?.[0]?.categories?.name ?? "UMKM",
+            image: photo,
+            imageAlt: photoAlt,
+            rating,
+          } satisfies FavoriteOutlet;
+        });
+
+      setFavorites(mapped);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadFavorites(); }, [loadFavorites]);
 
   async function handleRemove(outletId: string) {
-    await toggleFavorite(outletId);
+    setMessage(null);
+    setRemovingId(outletId);
+    const result = await toggleFavorite(outletId);
+    if (!result.success) {
+      setMessage(`Gagal menghapus favorit: ${result.error}`);
+      setRemovingId(null);
+      return;
+    }
+    setRemovingId(null);
     loadFavorites();
   }
 
@@ -87,14 +120,32 @@ export default function UserFavoritesPage() {
           <p className="text-body-sm text-on-surface-variant">Outlet yang Anda simpan untuk dikunjungi nanti</p>
         </header>
 
+        {message && (
+          <div className="mb-6 rounded-lg bg-error-container p-3 text-body-sm text-on-error-container" role="alert">
+            {message}
+          </div>
+        )}
+
         {loading ? (
-          <div className="text-center py-12 text-on-surface-variant">Loading...</div>
+          <div className="text-center py-12 text-on-surface-variant" role="status">Loading...</div>
+        ) : favorites.length === 0 ? (
+          <div className="rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+            <span className="material-symbols-outlined text-4xl mb-2 block" aria-hidden="true">favorite_border</span>
+            <p>Belum ada outlet favorit. Jelajahi outlet dan simpan yang Anda suka!</p>
+            <Link href="/outlets" className="text-primary hover:underline mt-2 inline-block">Jelajahi Outlet</Link>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {favorites.map((outlet) => (
               <div key={outlet.id} className="rounded-xl border border-outline-variant bg-surface overflow-hidden shadow-sm">
-                <div className="relative h-48">
-                  <Image src={outlet.image} alt={outlet.name} fill className="object-cover" />
+                <div className="relative h-48 bg-surface-container-high">
+                  {outlet.image ? (
+                    <Image src={outlet.image} alt={outlet.imageAlt ?? outlet.name} fill className="object-cover" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-on-surface-variant">
+                      <span className="material-symbols-outlined text-5xl" aria-hidden="true">storefront</span>
+                    </div>
+                  )}
                 </div>
                 <div className="p-6 space-y-3">
                   <div className="flex items-start justify-between">
@@ -102,15 +153,21 @@ export default function UserFavoritesPage() {
                       <h3 className="font-heading text-h3 text-on-surface">{outlet.name}</h3>
                       <p className="text-body-sm text-on-surface-variant">{outlet.category}</p>
                     </div>
-                    <Button variant="ghost" size="icon" aria-label="Hapus favorit" onClick={() => handleRemove(outlet.outlet_id)}>
-                      <span className="material-symbols-outlined text-error" style={{ fontVariationSettings: '"FILL" 1' }}>favorite</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Hapus ${outlet.name} dari favorit`}
+                      disabled={removingId === outlet.outlet_id}
+                      onClick={() => handleRemove(outlet.outlet_id)}
+                    >
+                      <span className="material-symbols-outlined text-error" style={{ fontVariationSettings: '"FILL" 1' }} aria-hidden="true">favorite</span>
                     </Button>
                   </div>
                   <p className="text-body-sm text-on-surface-variant line-clamp-2">{outlet.description}</p>
                   <div className="flex items-center justify-between pt-2 border-t border-outline-variant">
                     <div className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-sm text-primary-container" style={{ fontVariationSettings: '"FILL" 1' }}>star</span>
-                      <span className="text-body-sm text-on-surface">{outlet.rating}</span>
+                      <span className="material-symbols-outlined text-sm text-primary-container" style={{ fontVariationSettings: '"FILL" 1' }} aria-hidden="true">star</span>
+                      <span className="text-body-sm text-on-surface">{outlet.rating !== null ? outlet.rating : "–"}</span>
                     </div>
                     <Link href={`/outlets/${outlet.slug}`}>
                       <Button size="sm">Lihat Detail</Button>
@@ -119,13 +176,6 @@ export default function UserFavoritesPage() {
                 </div>
               </div>
             ))}
-            {favorites.length === 0 && (
-              <div className="col-span-full rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
-                <span className="material-symbols-outlined text-4xl mb-2">favorite_border</span>
-                <p>Belum ada outlet favorit. Jelajahi outlet dan simpan yang Anda suka!</p>
-                <Link href="/outlets" className="text-primary hover:underline mt-2 inline-block">Jelajahi Outlet</Link>
-              </div>
-            )}
           </div>
         )}
       </main>

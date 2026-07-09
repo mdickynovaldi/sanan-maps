@@ -256,8 +256,16 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     map.on("move", handleMove);
     setMapInstance(map);
 
+    // Keep the canvas in sync with the container size — the container is often
+    // laid out (flex/grid) after MapLibre reads its initial dimensions.
+    const resizeObserver = new ResizeObserver(() => {
+      map.resize();
+    });
+    resizeObserver.observe(containerRef.current);
+
     return () => {
       clearStyleTimeout();
+      resizeObserver.disconnect();
       map.off("load", loadHandler);
       map.off("styledata", styleDataHandler);
       map.off("move", handleMove);
@@ -729,6 +737,8 @@ type MapControlsProps = {
   className?: string;
   /** Callback with user coordinates when located */
   onLocate?: (coords: { longitude: number; latitude: number }) => void;
+  /** Callback when locating fails (unsupported browser, permission denied, timeout) */
+  onLocateError?: (message: string) => void;
 };
 
 const positionClasses = {
@@ -784,6 +794,7 @@ function MapControls({
   showFullscreen = false,
   className,
   onLocate,
+  onLocateError,
 }: MapControlsProps) {
   const { map } = useMap();
   const [waitingForLocation, setWaitingForLocation] = useState(false);
@@ -801,29 +812,36 @@ function MapControls({
   }, [map]);
 
   const handleLocate = useCallback(() => {
-    setWaitingForLocation(true);
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const coords = {
-            longitude: pos.coords.longitude,
-            latitude: pos.coords.latitude,
-          };
-          map?.flyTo({
-            center: [coords.longitude, coords.latitude],
-            zoom: 14,
-            duration: 1500,
-          });
-          onLocate?.(coords);
-          setWaitingForLocation(false);
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          setWaitingForLocation(false);
-        },
-      );
+    if (!("geolocation" in navigator)) {
+      onLocateError?.("Browser ini tidak mendukung geolokasi.");
+      return;
     }
-  }, [map, onLocate]);
+    setWaitingForLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const coords = {
+          longitude: pos.coords.longitude,
+          latitude: pos.coords.latitude,
+        };
+        map?.flyTo({
+          center: [coords.longitude, coords.latitude],
+          zoom: 16,
+          duration: 1500,
+        });
+        onLocate?.(coords);
+        setWaitingForLocation(false);
+      },
+      (error) => {
+        const message =
+          error.code === error.PERMISSION_DENIED
+            ? "Izin lokasi ditolak. Aktifkan izin lokasi di browser Anda."
+            : "Gagal mendapatkan lokasi Anda. Coba lagi.";
+        onLocateError?.(message);
+        setWaitingForLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  }, [map, onLocate, onLocateError]);
 
   const handleFullscreen = useCallback(() => {
     const container = map?.getContainer();

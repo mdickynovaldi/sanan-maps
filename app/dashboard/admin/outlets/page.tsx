@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { DashboardNav, adminNavItems } from "@/components/layout/dashboard-nav";
 import { OutletForm } from "@/components/features/outlet-form";
 import { getAllOutlets, approveOutlet, rejectOutlet } from "@/lib/actions/outlets";
-import { allOutlets as mockOutlets } from "@/lib/mock-data";
 
 type OutletRow = {
   id: string;
@@ -16,6 +15,11 @@ type OutletRow = {
   status: string;
   latitude: number;
   longitude: number;
+  description: string;
+  landmark_description: string;
+  accessibility_description: string;
+  whatsapp: string | null;
+  opening_hours: Record<string, string> | null;
 };
 
 export default function AdminOutletsPage() {
@@ -25,23 +29,16 @@ export default function AdminOutletsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingOutlet, setEditingOutlet] = useState<OutletRow | null>(null);
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState<string | null>(null);
 
   async function loadOutlets() {
     setLoading(true);
     const result = await getAllOutlets();
-    if (result.data && result.data.length > 0) {
-      setOutlets(result.data as unknown as OutletRow[]);
+    if (result.error) {
+      setMessage(`Gagal memuat outlet: ${result.error}`);
+      setOutlets([]);
     } else {
-      // Fallback to mock data
-      setOutlets(mockOutlets.map((o) => ({
-        id: String(o.id),
-        name: o.name,
-        slug: o.slug,
-        address: o.address,
-        status: o.status,
-        latitude: o.latitude,
-        longitude: o.longitude,
-      })));
+      setOutlets((result.data ?? []) as unknown as OutletRow[]);
     }
     setLoading(false);
   }
@@ -55,12 +52,16 @@ export default function AdminOutletsPage() {
   });
 
   async function handleApprove(id: string) {
-    await approveOutlet(id);
+    setMessage(null);
+    const result = await approveOutlet(id);
+    setMessage(result.success ? "Outlet disetujui dan kini tampil di peta publik." : `Gagal menyetujui: ${result.error}`);
     loadOutlets();
   }
 
   async function handleReject(id: string) {
-    await rejectOutlet(id);
+    setMessage(null);
+    const result = await rejectOutlet(id);
+    setMessage(result.success ? "Outlet ditolak." : `Gagal menolak: ${result.error}`);
     loadOutlets();
   }
 
@@ -80,6 +81,15 @@ export default function AdminOutletsPage() {
           </Button>
         </header>
 
+        {message && (
+          <div
+            className={`mb-6 rounded-lg p-3 text-body-sm ${message.startsWith("Gagal") ? "bg-error-container text-on-error-container" : "bg-tertiary/10 text-tertiary"}`}
+            role="status"
+          >
+            {message}
+          </div>
+        )}
+
         {/* Create/Edit Form */}
         {showForm && (
           <div className="mb-8 rounded-xl border border-outline-variant bg-surface p-6">
@@ -87,6 +97,7 @@ export default function AdminOutletsPage() {
               {editingOutlet ? `Edit: ${editingOutlet.name}` : "Tambah Outlet Baru"}
             </h3>
             <OutletForm
+              key={editingOutlet?.id ?? "create"}
               mode={editingOutlet ? "edit" : "create"}
               initialData={editingOutlet ? {
                 id: editingOutlet.id,
@@ -94,6 +105,11 @@ export default function AdminOutletsPage() {
                 address: editingOutlet.address,
                 latitude: editingOutlet.latitude,
                 longitude: editingOutlet.longitude,
+                description: editingOutlet.description,
+                landmarkDescription: editingOutlet.landmark_description,
+                accessibilityDescription: editingOutlet.accessibility_description,
+                whatsapp: editingOutlet.whatsapp,
+                openingHours: editingOutlet.opening_hours ?? undefined,
               } : undefined}
               onSuccess={() => { setShowForm(false); setEditingOutlet(null); loadOutlets(); }}
               onCancel={() => { setShowForm(false); setEditingOutlet(null); }}

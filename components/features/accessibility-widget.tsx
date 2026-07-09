@@ -81,6 +81,7 @@ export function AccessibilityWidget() {
       {/* Toggle Button */}
       <Button
         ref={triggerRef}
+        type="button"
         onClick={() => setOpen(!open)}
         className="h-14 w-14 rounded-full bg-primary-container text-on-primary-container shadow-lg hover:shadow-xl transition-shadow"
         size="icon"

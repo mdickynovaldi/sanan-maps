@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { featuredOutlets as mockFeaturedOutlets } from "@/lib/mock-data";
+import { isOutletOpenNow } from "@/lib/geo";
 import { createClient } from "@/lib/supabase/client";
 
 type HomeOutlet = {
@@ -17,53 +17,90 @@ type HomeOutlet = {
   description: string;
   latitude: number;
   longitude: number;
+  category: string;
+  rating: number | null;
+  isOpen: boolean | null;
+  imageUrl: string | null;
+  imageAlt: string | null;
+};
+
+type OutletRow = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  latitude: number;
+  longitude: number;
+  opening_hours: Record<string, string> | null;
+  outlet_categories: Array<{ categories: { name: string } | null }> | null;
+  reviews: Array<{ rating: number; status: string }> | null;
+  products: Array<{ image_url: string | null; image_alt: string | null }> | null;
 };
 
 export default function Home() {
   const [outlets, setOutlets] = useState<HomeOutlet[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
-      try {
-        const supabase = createClient();
-        const { data } = await supabase
+      setLoading(true);
+      setError(null);
+      const supabase = createClient();
+
+      const [featuredResult, countResult] = await Promise.all([
+        supabase
           .from("outlets")
-          .select("id, slug, name, description, latitude, longitude")
+          .select(
+            "id, slug, name, description, latitude, longitude, opening_hours, outlet_categories(categories(name)), reviews(rating, status), products(image_url, image_alt)",
+          )
           .eq("status", "approved")
           .order("created_at", { ascending: false })
-          .limit(3);
+          .limit(3),
+        supabase
+          .from("outlets")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "approved"),
+      ]);
 
-        if (data && data.length > 0) {
-          setOutlets(data as unknown as HomeOutlet[]);
-          return;
-        }
-      } catch {
-        // fallback below
+      if (featuredResult.error) {
+        setError(`Gagal memuat outlet unggulan: ${featuredResult.error.message}`);
+        setOutlets([]);
+        setLoading(false);
+        return;
       }
 
-      setOutlets(mockFeaturedOutlets.map((o) => ({
-        id: String(o.id),
-        slug: o.slug,
-        name: o.name,
-        description: o.description,
-        latitude: o.latitude,
-        longitude: o.longitude,
-      })));
+      const mapped = ((featuredResult.data ?? []) as unknown as OutletRow[]).map((row) => {
+        // Hanya review approved yang menghitung rating publik (viewer login bisa
+        // "melihat" review pending miliknya sendiri via RLS).
+        const ratings = (row.reviews ?? []).filter((r) => r.status === "approved");
+        const rating =
+          ratings.length > 0
+            ? Math.round((ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length) * 10) / 10
+            : null;
+        const firstPhoto = (row.products ?? []).find((p) => p.image_url) ?? null;
+        return {
+          id: row.id,
+          slug: row.slug,
+          name: row.name,
+          description: row.description,
+          latitude: Number(row.latitude),
+          longitude: Number(row.longitude),
+          category: row.outlet_categories?.[0]?.categories?.name ?? "UMKM",
+          rating,
+          isOpen: isOutletOpenNow(row.opening_hours),
+          imageUrl: firstPhoto?.image_url ?? null,
+          imageAlt: firstPhoto?.image_alt ?? null,
+        } satisfies HomeOutlet;
+      });
+
+      setOutlets(mapped);
+      setTotalCount(countResult.count ?? 0);
+      setLoading(false);
     }
     load();
   }, []);
-
-  const visibleOutlets = useMemo(() => {
-    if (outlets.length > 0) return outlets;
-    return mockFeaturedOutlets.map((o) => ({
-      id: String(o.id),
-      slug: o.slug,
-      name: o.name,
-      description: o.description,
-      latitude: o.latitude,
-      longitude: o.longitude,
-    }));
-  }, [outlets]);
 
   return (
     <>
@@ -77,7 +114,7 @@ export default function Home() {
             <div className="flex flex-col gap-8">
               <div className="space-y-4">
                 <span className="inline-flex items-center gap-2 rounded-full border border-outline-variant bg-surface-container-high px-3 py-1 text-label-caps text-on-surface-variant">
-                  <span className="material-symbols-outlined text-[16px] text-primary">location_on</span>
+                  <span className="material-symbols-outlined text-[16px] text-primary" aria-hidden="true">location_on</span>
                   Sentra Industri Keripik Tempe
                 </span>
                 <h1 className="font-heading text-h1 text-on-background">
@@ -91,7 +128,7 @@ export default function Home() {
               </div>
 
               <div className="flex w-full max-w-xl items-center gap-3 rounded-[1rem] border border-outline-variant bg-surface-container-lowest p-2 shadow-[var(--shadow-level-1)]">
-                <span className="material-symbols-outlined pl-2 text-outline">search</span>
+                <span className="material-symbols-outlined pl-2 text-outline" aria-hidden="true">search</span>
                 <input
                   className="w-full bg-transparent py-2 text-body-md text-on-surface outline-none placeholder:text-outline-variant"
                   placeholder="Cari outlet, produk, atau lokasi..."
@@ -105,7 +142,7 @@ export default function Home() {
               <div className="flex flex-wrap items-center gap-4">
                 <Button asChild className="rounded-full bg-primary-container px-6 py-6 text-label-caps text-on-primary-container hover:bg-primary-container/90">
                   <Link href="/map">
-                    <span className="material-symbols-outlined text-[18px]">map</span>
+                    <span className="material-symbols-outlined text-[18px]" aria-hidden="true">map</span>
                     Buka Peta
                   </Link>
                 </Button>
@@ -115,7 +152,7 @@ export default function Home() {
                   className="rounded-full border-outline px-6 py-6 text-label-caps text-on-surface hover:bg-surface-container-high"
                 >
                   <Link href="/outlets">
-                    <span className="material-symbols-outlined text-[18px]">accessible</span>
+                    <span className="material-symbols-outlined text-[18px]" aria-hidden="true">accessible</span>
                     Daftar Outlet Aksesibel
                   </Link>
                 </Button>
@@ -132,12 +169,12 @@ export default function Home() {
               />
               <div className="absolute bottom-8 left-8 flex items-center gap-4 rounded-xl border border-outline-variant bg-surface-container-lowest/90 p-4 shadow-lg backdrop-blur-md">
                 <div className="flex items-center justify-center rounded-full bg-primary-container p-3 text-on-primary-container">
-                  <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>
+                  <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }} aria-hidden="true">
                     storefront
                   </span>
                 </div>
                 <div>
-                  <p className="font-heading text-h3 text-on-surface">{outlets.length > 0 ? `${outlets.length}+` : "120+"}</p>
+                  <p className="font-heading text-h3 text-on-surface">{loading ? "…" : totalCount}</p>
                   <p className="text-body-sm text-on-surface-variant">UMKM Aktif</p>
                 </div>
               </div>
@@ -155,48 +192,84 @@ export default function Home() {
                 </p>
               </div>
               <Link href="/outlets" className="flex items-center gap-1 text-label-caps text-primary hover:underline">
-                Lihat Semua <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                Lihat Semua <span className="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_forward</span>
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {visibleOutlets.map((outlet) => (
-                <Card key={outlet.id} className="group overflow-hidden">
-                  <div className="relative h-48 overflow-hidden bg-surface-container-high">
-                    <Image src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80" alt={outlet.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
-                    <div className="absolute left-4 top-4 rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wide shadow-sm bg-[#e6f4ea] text-[#137333]">
-                      Buka
-                    </div>
-                  </div>
-                  <CardContent className="flex flex-col gap-4 p-6">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <h3 className="font-heading text-h3 text-on-surface">{outlet.name}</h3>
-                        <p className="mt-1 text-body-sm text-on-surface-variant">{outlet.description}</p>
+            {error ? (
+              <div role="alert" className="rounded-xl border border-outline-variant bg-error-container p-8 text-center text-on-error-container">
+                {error}
+              </div>
+            ) : loading ? (
+              <div role="status" className="rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+                Memuat outlet unggulan...
+              </div>
+            ) : outlets.length === 0 ? (
+              <div className="rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+                Belum ada outlet unggulan.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {outlets.map((outlet) => {
+                  const openLabel =
+                    outlet.isOpen === null ? "Lihat jam buka" : outlet.isOpen ? "Buka" : "Tutup";
+                  const badgeClass =
+                    outlet.isOpen === null
+                      ? "bg-surface-container-high text-on-surface-variant"
+                      : outlet.isOpen
+                        ? "bg-[#e6f4ea] text-[#137333]"
+                        : "bg-error-container text-on-error-container";
+
+                  return (
+                    <Card key={outlet.id} className="group overflow-hidden">
+                      <div className="relative h-48 overflow-hidden bg-surface-container-high">
+                        {outlet.imageUrl ? (
+                          <Image
+                            src={outlet.imageUrl}
+                            alt={outlet.imageAlt ?? outlet.name}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-on-surface-variant">
+                            <span className="material-symbols-outlined text-5xl" aria-hidden="true">storefront</span>
+                          </div>
+                        )}
+                        <div className={`absolute left-4 top-4 rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wide shadow-sm ${badgeClass}`}>
+                          {openLabel}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1 text-primary-container">
-                        <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: '"FILL" 1' }}>
-                          star
-                        </span>
-                        <span className="text-label-caps text-on-surface">4.5</span>
-                      </div>
-                    </div>
-                    <div className="mt-auto flex items-center justify-between border-t border-outline-variant/40 pt-4">
-                      <div className="flex flex-wrap gap-2">
-                        <span className="rounded-full bg-secondary-container px-2.5 py-1 text-[12px] text-on-secondary-container">
-                          UMKM
-                        </span>
-                      </div>
-                      <Button asChild variant="ghost" size="icon" aria-label={`Arahkan ke ${outlet.name}`}>
-                        <a href={`https://www.google.com/maps/dir/?api=1&destination=${outlet.latitude},${outlet.longitude}`} target="_blank" rel="noopener noreferrer">
-                          <span className="material-symbols-outlined">directions</span>
-                        </a>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                      <CardContent className="flex flex-col gap-4 p-6">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h3 className="font-heading text-h3 text-on-surface">{outlet.name}</h3>
+                            <p className="mt-1 text-body-sm text-on-surface-variant">{outlet.description}</p>
+                          </div>
+                          <div className="flex items-center gap-1 text-primary-container">
+                            <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: '"FILL" 1' }} aria-hidden="true">
+                              star
+                            </span>
+                            <span className="text-label-caps text-on-surface">{outlet.rating !== null ? outlet.rating : "–"}</span>
+                          </div>
+                        </div>
+                        <div className="mt-auto flex items-center justify-between border-t border-outline-variant/40 pt-4">
+                          <div className="flex flex-wrap gap-2">
+                            <span className="rounded-full bg-secondary-container px-2.5 py-1 text-[12px] text-on-secondary-container">
+                              {outlet.category}
+                            </span>
+                          </div>
+                          <Button asChild variant="ghost" size="icon" aria-label={`Arahkan ke ${outlet.name}`}>
+                            <a href={`https://www.google.com/maps/dir/?api=1&destination=${outlet.latitude},${outlet.longitude}`} target="_blank" rel="noopener noreferrer">
+                              <span className="material-symbols-outlined" aria-hidden="true">directions</span>
+                            </a>
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </section>
       </main>

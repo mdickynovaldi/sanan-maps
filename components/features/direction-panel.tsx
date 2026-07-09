@@ -21,7 +21,17 @@ export function DirectionPanel({
   accessibilityDescription,
 }: DirectionPanelProps) {
   const [showPanel, setShowPanel] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<string | null>(null);
   const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+
+  async function handleCopyLink() {
+    try {
+      await navigator.clipboard.writeText(googleMapsUrl);
+      setCopyStatus("Link Google Maps tersalin.");
+    } catch {
+      setCopyStatus("Gagal menyalin link. Salin manual: " + googleMapsUrl);
+    }
+  }
 
   return (
     <div className="rounded-xl border border-outline-variant bg-surface overflow-hidden">
@@ -36,8 +46,14 @@ export function DirectionPanel({
             <p className="text-body-sm text-on-surface-variant">{address}</p>
           </div>
         </div>
-        <Button variant="ghost" size="sm" onClick={() => setShowPanel(!showPanel)} aria-expanded={showPanel}>
-          <span className="material-symbols-outlined text-sm">{showPanel ? "expand_less" : "expand_more"}</span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowPanel(!showPanel)}
+          aria-expanded={showPanel}
+          aria-label={showPanel ? "Sembunyikan instruksi arah teks" : "Tampilkan instruksi arah teks"}
+        >
+          <span className="material-symbols-outlined text-sm" aria-hidden="true">{showPanel ? "expand_less" : "expand_more"}</span>
         </Button>
       </div>
 
@@ -89,16 +105,13 @@ export function DirectionPanel({
 
           {/* Copy link */}
           <div className="pt-2 border-t border-outline-variant">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                navigator.clipboard.writeText(googleMapsUrl);
-              }}
-            >
-              <span className="material-symbols-outlined text-sm">content_copy</span>
+            <Button variant="ghost" size="sm" onClick={handleCopyLink}>
+              <span className="material-symbols-outlined text-sm" aria-hidden="true">content_copy</span>
               Salin Link Google Maps
             </Button>
+            <p aria-live="polite" className="mt-1 text-body-sm text-on-surface-variant">
+              {copyStatus}
+            </p>
           </div>
         </div>
       )}

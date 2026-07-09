@@ -8,6 +8,16 @@ const redis = redisUrl && redisToken
   ? new Redis({ url: redisUrl, token: redisToken })
   : null;
 
+// Fallback in-memory hanya efektif untuk dev/single-process. Di serverless
+// (Vercel dsb.) tiap instance punya Map sendiri sehingga rate limit tidak
+// benar-benar berlaku — peringatkan sekali saat produksi tanpa Redis.
+if (!redis && process.env.NODE_ENV === "production") {
+  console.warn(
+    "[rate-limit] Upstash Redis tidak dikonfigurasi (UPSTASH_REDIS_REST_URL/TOKEN). " +
+      "Rate limiting hanya memakai fallback in-memory yang TIDAK aman di serverless.",
+  );
+}
+
 const inMemory = new Map<string, { count: number; resetAt: number }>();
 
 export async function checkRateLimit(

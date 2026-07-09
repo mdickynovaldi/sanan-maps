@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DashboardNav, adminNavItems } from "@/components/layout/dashboard-nav";
 import { getReports, resolveReport } from "@/lib/actions/reports";
-import { mockReports } from "@/lib/mock-data";
 
 type ReportRow = {
   id: string;
@@ -19,42 +18,38 @@ type ReportRow = {
 export default function AdminReportsPage() {
   const [reports, setReports] = useState<ReportRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
 
-  async function loadReports() {
+  const loadReports = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const result = await getReports();
-      if (result.data && result.data.length > 0) {
-        setReports(result.data as unknown as ReportRow[]);
+      if (result.error) {
+        setError(`Gagal memuat laporan: ${result.error}`);
+        setReports([]);
       } else {
-        throw new Error("empty");
+        setReports((result.data ?? []) as unknown as ReportRow[]);
       }
-    } catch {
-      setReports(mockReports.map((r) => ({
-        id: String(r.id),
-        outlet_id: "",
-        type: r.type,
-        description: r.description,
-        status: r.status,
-        created_at: new Date().toISOString(),
-        outlets: { name: r.outletName },
-      })));
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  }
+  }, []);
 
-  useEffect(() => { loadReports(); }, []);
+  useEffect(() => { loadReports(); }, [loadReports]);
 
   const filtered = filter === "all" ? reports : reports.filter((r) => r.status === filter);
 
-  async function handleResolve(id: string) {
-    await resolveReport(id, "resolved");
-    loadReports();
-  }
-
-  async function handleReject(id: string) {
-    await resolveReport(id, "rejected");
+  async function handleResolve(id: string, status: "resolved" | "rejected") {
+    setMessage(null);
+    const result = await resolveReport(id, status);
+    if (!result.success) {
+      setMessage(`Gagal memperbarui laporan: ${result.error}`);
+    } else {
+      setMessage(status === "resolved" ? "Laporan ditandai selesai." : "Laporan ditolak.");
+    }
     loadReports();
   }
 
@@ -75,6 +70,18 @@ export default function AdminReportsPage() {
           <p className="text-body-sm text-on-surface-variant">Kelola laporan dari pengguna tentang data yang tidak akurat</p>
         </header>
 
+        {message && (
+          <div className="mb-6 rounded-lg bg-secondary-container p-3 text-body-sm text-on-secondary-container" role="status">
+            {message}
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-6 rounded-lg bg-error-container p-3 text-body-sm text-on-error-container" role="alert">
+            {error}
+          </div>
+        )}
+
         <div className="mb-6 flex gap-2">
           {["all", "open", "in_review", "resolved", "rejected"].map((s) => (
             <Button
@@ -90,7 +97,7 @@ export default function AdminReportsPage() {
         </div>
 
         {loading ? (
-          <div className="text-center py-12 text-on-surface-variant">Loading...</div>
+          <div className="text-center py-12 text-on-surface-variant" role="status">Loading...</div>
         ) : (
           <div className="rounded-xl border border-outline-variant bg-surface overflow-hidden">
             <table className="w-full text-left">
@@ -106,7 +113,11 @@ export default function AdminReportsPage() {
               <tbody className="text-body-sm divide-y divide-outline-variant">
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="p-8 text-center text-on-surface-variant">Tidak ada laporan.</td>
+                    <td colSpan={5} className="p-8 text-center text-on-surface-variant">
+                      {reports.length === 0
+                        ? "Belum ada laporan dari pengguna."
+                        : "Tidak ada laporan dengan status ini."}
+                    </td>
                   </tr>
                 )}
                 {filtered.map((report) => (
@@ -127,10 +138,10 @@ export default function AdminReportsPage() {
                     <td className="p-4">
                       {report.status === "open" || report.status === "in_review" ? (
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" className="text-tertiary text-xs" onClick={() => handleResolve(report.id)}>
+                          <Button variant="ghost" size="sm" className="text-tertiary text-xs" onClick={() => handleResolve(report.id, "resolved")}>
                             Resolve
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-error text-xs" onClick={() => handleReject(report.id)}>
+                          <Button variant="ghost" size="sm" className="text-error text-xs" onClick={() => handleResolve(report.id, "rejected")}>
                             Reject
                           </Button>
                         </div>

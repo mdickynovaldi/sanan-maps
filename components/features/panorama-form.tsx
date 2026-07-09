@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { uploadImage } from "@/lib/actions/upload";
+import { uploadAudio, uploadImage } from "@/lib/actions/upload";
 import { createPanorama } from "@/lib/actions/panoramas";
 
 interface PanoramaFormProps {
@@ -54,7 +54,7 @@ export function PanoramaForm({ outletId, onSuccess, onCancel }: PanoramaFormProp
     const formData = new FormData();
     formData.append("file", file);
 
-    const result = await uploadImage(formData, "audio");
+    const result = await uploadAudio(formData, "audio");
     if (!result.success || !result.url) {
       setError(result.error ?? "Gagal upload audio");
     } else {
@@ -190,7 +190,7 @@ export function PanoramaForm({ outletId, onSuccess, onCancel }: PanoramaFormProp
             name="latitude"
             type="number"
             step="any"
-            placeholder="-7.9826"
+            placeholder="-7.9612"
             className="w-full px-4 py-2 rounded border border-outline-variant bg-surface-container-lowest text-body-md outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
@@ -201,7 +201,7 @@ export function PanoramaForm({ outletId, onSuccess, onCancel }: PanoramaFormProp
             name="longitude"
             type="number"
             step="any"
-            placeholder="112.6500"
+            placeholder="112.6440"
             className="w-full px-4 py-2 rounded border border-outline-variant bg-surface-container-lowest text-body-md outline-none focus:ring-2 focus:ring-primary"
           />
         </div>

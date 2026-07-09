@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { DashboardNav, adminNavItems } from "@/components/layout/dashboard-nav";
 import { moderateReview } from "@/lib/actions/reviews";
 import { createClient } from "@/lib/supabase/client";
-import { allOutlets } from "@/lib/mock-data";
 
 type ReviewRow = {
   id: string;
@@ -15,60 +14,35 @@ type ReviewRow = {
   comment: string;
   status: string;
   created_at: string;
-  outletName?: string;
-  userName?: string;
+  outlets: { name: string } | null;
+  profiles: { name: string } | null;
 };
 
 export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState<ReviewRow[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState<string | null>(null);
 
   async function loadReviews() {
     setLoading(true);
+    setMessage(null);
     try {
       const supabase = createClient();
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("reviews")
-        .select("*")
+        .select("*, outlets(name), profiles(name)")
         .order("created_at", { ascending: false });
 
-      if (data && data.length > 0) {
-        setReviews(data as unknown as ReviewRow[]);
+      if (error) {
+        setMessage(`Gagal memuat review: ${error.message}`);
+        setReviews([]);
       } else {
-        // Fallback to mock
-        const mockReviews = allOutlets.flatMap((o) =>
-          o.reviews.map((r) => ({
-            id: String(r.id),
-            outlet_id: String(o.id),
-            user_id: r.userName,
-            rating: r.rating,
-            comment: r.comment,
-            status: r.status,
-            created_at: r.date,
-            outletName: o.name,
-            userName: r.userName,
-          }))
-        );
-        setReviews(mockReviews);
+        setReviews((data ?? []) as unknown as ReviewRow[]);
       }
-    } catch {
-      const mockReviews = allOutlets.flatMap((o) =>
-        o.reviews.map((r) => ({
-          id: String(r.id),
-          outlet_id: String(o.id),
-          user_id: r.userName,
-          rating: r.rating,
-          comment: r.comment,
-          status: r.status,
-          created_at: r.date,
-          outletName: o.name,
-          userName: r.userName,
-        }))
-      );
-      setReviews(mockReviews);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   useEffect(() => { loadReviews(); }, []);
@@ -76,7 +50,9 @@ export default function AdminReviewsPage() {
   const filtered = filter === "all" ? reviews : reviews.filter((r) => r.status === filter);
 
   async function handleModerate(id: string, status: string) {
-    await moderateReview(id, status);
+    setMessage(null);
+    const result = await moderateReview(id, status);
+    if (!result.success) setMessage(`Gagal moderasi: ${result.error}`);
     loadReviews();
   }
 
@@ -89,6 +65,12 @@ export default function AdminReviewsPage() {
           <h2 className="font-heading text-h2 text-on-surface">Moderasi Review</h2>
           <p className="text-body-sm text-on-surface-variant">Kelola dan moderasi review pengguna</p>
         </header>
+
+        {message && (
+          <div className="mb-6 rounded-lg bg-error-container p-3 text-body-sm text-on-error-container" role="alert">
+            {message}
+          </div>
+        )}
 
         <div className="mb-6 flex gap-2">
           {["all", "approved", "pending", "hidden"].map((s) => (
@@ -118,9 +100,9 @@ export default function AdminReviewsPage() {
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-on-surface">{review.userName ?? "User"}</span>
-                      {review.outletName && (
-                        <span className="text-body-sm text-on-surface-variant">&rarr; {review.outletName}</span>
+                      <span className="font-medium text-on-surface">{review.profiles?.name ?? "Pengguna"}</span>
+                      {review.outlets?.name && (
+                        <span className="text-body-sm text-on-surface-variant">&rarr; {review.outlets.name}</span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
