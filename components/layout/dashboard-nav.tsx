@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/layout/logo";
 import { signOut } from "@/lib/actions/auth";
 
 type NavItem = {
@@ -28,10 +29,13 @@ export function DashboardNav({ title, subtitle, items, cta }: DashboardNavProps)
 
   return (
     <nav className="hidden md:flex fixed left-0 top-0 h-full w-[280px] border-r border-slate-200 bg-slate-50 p-4 flex-col gap-2 z-40">
-      <div className="mb-6 px-4 py-2">
-        <h1 className="text-lg font-black text-slate-900 font-heading">{title}</h1>
-        <p className="text-xs text-slate-600">{subtitle}</p>
-      </div>
+      <Link href="/" className="mb-6 flex items-center gap-2.5 px-4 py-2">
+        <Logo className="h-9 w-9 shrink-0" />
+        <div>
+          <h1 className="text-lg font-black text-slate-900 font-heading leading-tight">{title}</h1>
+          <p className="text-xs text-slate-600">{subtitle}</p>
+        </div>
+      </Link>
 
       <div className="flex-1 flex flex-col gap-2">
         {items.map((item) => {

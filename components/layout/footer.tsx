@@ -15,7 +15,7 @@ export function Footer({ className }: FooterProps) {
       )}
     >
       <div className="text-amber-500 opacity-80 hover:opacity-100 transition-opacity text-center md:text-left">
-        © 2024 Sanan Artisan Village. Empowering Local MSMEs.
+        © 2026 Sanan Artisan Village. Empowering Local MSMEs.
       </div>
       <nav className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
         <a

@@ -4,6 +4,7 @@ import { Suspense, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/layout/header";
+import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import { signIn } from "@/lib/actions/auth";
 
@@ -71,7 +72,7 @@ function LoginPageInner() {
           <div className="hidden lg:flex flex-col justify-between bg-surface-variant p-12 text-surface-container-lowest">
             <div>
               <div className="mb-8 flex items-center gap-2">
-                <span className="material-symbols-outlined text-4xl" style={{ fontVariationSettings: '"FILL" 1' }}>explore</span>
+                <Logo className="h-9 w-9" />
                 <span className="font-heading text-h3">Sanan Explorer</span>
               </div>
             </div>
