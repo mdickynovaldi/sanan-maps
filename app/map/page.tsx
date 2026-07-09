@@ -97,6 +97,8 @@ export default function MapPage() {
   const [route, setRoute] = useState<ActiveRoute | null>(null);
   const [routeLoadingId, setRouteLoadingId] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  // Fallback Google Maps ketika rute in-app gagal (mis. layanan rute down).
+  const [routeErrorMaps, setRouteErrorMaps] = useState<string | null>(null);
   // Penanda permintaan rute terbaru — respons lama yang datang terlambat diabaikan.
   const routeRequestRef = useRef(0);
 
@@ -220,8 +222,10 @@ export default function MapPage() {
     async (outlet: MapOutlet) => {
       const requestId = ++routeRequestRef.current;
       setStatusMessage(null);
+      setRouteErrorMaps(null);
       setRouteLoadingId(outlet.id);
       setSelectedOutletId(outlet.id);
+      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${outlet.latitude},${outlet.longitude}&travelmode=walking`;
       try {
         const origin = userLocation ?? (await requestLocation());
         setUserLocation(origin);
@@ -231,10 +235,8 @@ export default function MapPage() {
         if (requestId !== routeRequestRef.current) return;
 
         if (!result) {
-          setStatusMessage(
-            (routeError ? `${routeError} ` : "") +
-              "Gunakan tombol “Arah” untuk membuka Google Maps.",
-          );
+          setStatusMessage(routeError ?? "Layanan rute sedang tidak tersedia.");
+          setRouteErrorMaps(mapsUrl);
           return;
         }
 
@@ -254,6 +256,7 @@ export default function MapPage() {
       } catch (e) {
         if (requestId === routeRequestRef.current) {
           setStatusMessage(e instanceof Error ? e.message : "Gagal menampilkan rute.");
+          setRouteErrorMaps(mapsUrl);
         }
       } finally {
         if (requestId === routeRequestRef.current) {
@@ -267,6 +270,7 @@ export default function MapPage() {
   const clearRoute = useCallback(() => {
     setRoute(null);
     setStatusMessage(null);
+    setRouteErrorMaps(null);
   }, []);
 
   return (
@@ -369,15 +373,6 @@ export default function MapPage() {
                       >
                         {routeLoadingId === outlet.id ? "Mencari rute..." : "Rute"}
                       </button>
-                      <a
-                        href={`https://www.google.com/maps/dir/?api=1&destination=${outlet.latitude},${outlet.longitude}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-body-sm text-primary hover:underline"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        Arah
-                      </a>
                     </div>
                   </article>
                 );
@@ -449,14 +444,6 @@ export default function MapPage() {
                         <button type="button" className="text-xs text-primary hover:underline" onClick={() => handleShowRoute(outlet)}>
                           Rute
                         </button>
-                        <a
-                          href={`https://www.google.com/maps/dir/?api=1&destination=${outlet.latitude},${outlet.longitude}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-primary hover:underline"
-                        >
-                          Arah
-                        </a>
                       </div>
                     </div>
                   </MarkerPopup>
@@ -504,7 +491,17 @@ export default function MapPage() {
               <div className="pointer-events-auto flex items-center gap-3 rounded-xl border border-outline-variant bg-surface px-4 py-3 shadow-lg">
                 <span className="material-symbols-outlined text-error" aria-hidden="true">error</span>
                 <p className="text-body-sm text-on-surface">{statusMessage}</p>
-                <Button variant="ghost" size="icon" aria-label="Tutup pesan" onClick={() => setStatusMessage(null)}>
+                {routeErrorMaps && (
+                  <a
+                    href={routeErrorMaps}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="whitespace-nowrap text-body-sm font-medium text-primary hover:underline"
+                  >
+                    Buka di Google Maps
+                  </a>
+                )}
+                <Button variant="ghost" size="icon" aria-label="Tutup pesan" onClick={() => { setStatusMessage(null); setRouteErrorMaps(null); }}>
                   <span className="material-symbols-outlined text-sm" aria-hidden="true">close</span>
                 </Button>
               </div>
