@@ -8,6 +8,7 @@ import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { isOutletOpenNow } from "@/lib/geo";
+import { getCategoryThumbnail } from "@/lib/thumbnails";
 import { createClient } from "@/lib/supabase/client";
 
 type HomeOutlet = {
@@ -18,6 +19,7 @@ type HomeOutlet = {
   latitude: number;
   longitude: number;
   category: string;
+  categorySlug: string | null;
   rating: number | null;
   isOpen: boolean | null;
   imageUrl: string | null;
@@ -32,7 +34,7 @@ type OutletRow = {
   latitude: number;
   longitude: number;
   opening_hours: Record<string, string> | null;
-  outlet_categories: Array<{ categories: { name: string } | null }> | null;
+  outlet_categories: Array<{ categories: { name: string; slug: string } | null }> | null;
   reviews: Array<{ rating: number; status: string }> | null;
   products: Array<{ image_url: string | null; image_alt: string | null }> | null;
 };
@@ -53,7 +55,7 @@ export default function Home() {
         supabase
           .from("outlets")
           .select(
-            "id, slug, name, description, latitude, longitude, opening_hours, outlet_categories(categories(name)), reviews(rating, status), products(image_url, image_alt)",
+            "id, slug, name, description, latitude, longitude, opening_hours, outlet_categories(categories(name, slug)), reviews(rating, status), products(image_url, image_alt)",
           )
           .eq("status", "approved")
           .order("created_at", { ascending: false })
@@ -88,6 +90,7 @@ export default function Home() {
           latitude: Number(row.latitude),
           longitude: Number(row.longitude),
           category: row.outlet_categories?.[0]?.categories?.name ?? "UMKM",
+          categorySlug: row.outlet_categories?.[0]?.categories?.slug ?? null,
           rating,
           isOpen: isOutletOpenNow(row.opening_hours),
           imageUrl: firstPhoto?.image_url ?? null,
@@ -141,7 +144,8 @@ export default function Home() {
 
               <div className="flex flex-wrap items-center gap-4">
                 <Button asChild className="rounded-full bg-primary-container px-6 py-6 text-label-caps text-on-primary-container hover:bg-primary-container/90">
-                  <Link href="/map">
+                  {/* ?view=map = niat eksplisit membuka peta, melewati preferensi Mode Daftar */}
+                  <Link href="/map?view=map">
                     <span className="material-symbols-outlined text-[18px]" aria-hidden="true">map</span>
                     Buka Peta
                   </Link>
@@ -223,18 +227,13 @@ export default function Home() {
                   return (
                     <Card key={outlet.id} className="group overflow-hidden">
                       <div className="relative h-48 overflow-hidden bg-surface-container-high">
-                        {outlet.imageUrl ? (
-                          <Image
-                            src={outlet.imageUrl}
-                            alt={outlet.imageAlt ?? outlet.name}
-                            fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center text-on-surface-variant">
-                            <span className="material-symbols-outlined text-5xl" aria-hidden="true">storefront</span>
-                          </div>
-                        )}
+                        <Image
+                          src={outlet.imageUrl ?? getCategoryThumbnail(outlet.categorySlug)}
+                          alt={outlet.imageUrl ? (outlet.imageAlt ?? outlet.name) : `Ilustrasi kategori ${outlet.category} — foto belum tersedia`}
+                          fill
+                          unoptimized={!outlet.imageUrl}
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
                         <div className={`absolute left-4 top-4 rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wide shadow-sm ${badgeClass}`}>
                           {openLabel}
                         </div>

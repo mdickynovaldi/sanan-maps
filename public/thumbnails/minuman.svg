@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Ilustrasi minuman segar">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFC63A"/>
+      <stop offset="1" stop-color="#E08400"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="#FFF8EC"/>
+  <circle cx="400" cy="340" r="235" fill="#FFDDAF" opacity="0.5"/>
+  <g>
+    <path d="M0 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M100 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M200 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M300 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M400 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M500 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M600 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M700 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+  </g>
+  <ellipse cx="400" cy="500" rx="200" ry="24" fill="#6A4700" opacity="0.08"/>
+  <!-- Sedotan -->
+  <path d="M462 148l-38 148" stroke="#C2410C" stroke-width="18" stroke-linecap="round"/>
+  <!-- Gelas -->
+  <path d="M322 230h156l-14 236a18 18 0 0 1-18 17h-92a18 18 0 0 1-18-17Z" fill="#FFFDF7" stroke="#E08400" stroke-width="6"/>
+  <!-- Isi minuman berlapis -->
+  <path d="M334 296h132l-9 162a12 12 0 0 1-12 11h-90a12 12 0 0 1-12-11Z" fill="url(#g)"/>
+  <path d="M338 366h124l-5 92a12 12 0 0 1-12 11h-90a12 12 0 0 1-12-11Z" fill="#6A4700" opacity="0.85"/>
+  <!-- Es batu -->
+  <g fill="#FFF8EC" opacity="0.85">
+    <rect x="352" y="308" width="34" height="34" rx="8" transform="rotate(-12 369 325)"/>
+    <rect x="412" y="316" width="34" height="34" rx="8" transform="rotate(16 429 333)"/>
+  </g>
+  <!-- Gelembung -->
+  <g fill="#FFF8EC" opacity="0.7">
+    <circle cx="366" cy="420" r="7"/>
+    <circle cx="404" cy="440" r="5"/>
+    <circle cx="436" cy="414" r="6"/>
+  </g>
+</svg>

@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { isOutletOpenNow } from "@/lib/geo";
+import { getCategoryThumbnail } from "@/lib/thumbnails";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ type OutletItem = {
   landmark: string;
   accessibility: string;
   category: string;
+  categorySlug: string | null;
   rating: number | null;
   reviewCount: number;
   isOpen: boolean | null;
@@ -41,7 +43,7 @@ type OutletRow = {
   landmark_description: string;
   accessibility_description: string;
   opening_hours: Record<string, string> | null;
-  outlet_categories: Array<{ categories: { name: string } | null }> | null;
+  outlet_categories: Array<{ categories: { name: string; slug: string } | null }> | null;
   reviews: Array<{ rating: number; status: string }> | null;
   products: Array<{ image_url: string | null; image_alt: string | null }> | null;
 };
@@ -62,7 +64,7 @@ export default function OutletsPage() {
       const { data, error: queryError } = await supabase
         .from("outlets")
         .select(
-          "id, slug, name, description, address, latitude, longitude, landmark_description, accessibility_description, opening_hours, outlet_categories(categories(name)), reviews(rating, status), products(image_url, image_alt)",
+          "id, slug, name, description, address, latitude, longitude, landmark_description, accessibility_description, opening_hours, outlet_categories(categories(name, slug)), reviews(rating, status), products(image_url, image_alt)",
         )
         .eq("status", "approved")
         .order("created_at", { ascending: false });
@@ -91,6 +93,7 @@ export default function OutletsPage() {
           landmark: row.landmark_description,
           accessibility: row.accessibility_description,
           category: row.outlet_categories?.[0]?.categories?.name ?? "UMKM",
+          categorySlug: row.outlet_categories?.[0]?.categories?.slug ?? null,
           rating,
           reviewCount: ratings.length,
           isOpen: isOutletOpenNow(row.opening_hours),
@@ -152,7 +155,7 @@ export default function OutletsPage() {
               <p className="text-body-lg text-on-surface-variant">Daftar outlet dengan informasi aksesibilitas terperinci.</p>
             </div>
             <Button asChild variant="outline">
-              <Link href="/map"><span className="material-symbols-outlined text-sm" aria-hidden="true">map</span>Buka Mode Peta</Link>
+              <Link href="/map?view=map"><span className="material-symbols-outlined text-sm" aria-hidden="true">map</span>Buka Mode Peta</Link>
             </Button>
           </div>
 
@@ -243,13 +246,13 @@ export default function OutletsPage() {
             {!loading && !error && filtered.map((outlet) => (
               <article key={outlet.id} className="flex flex-col gap-6 rounded-xl border border-outline-variant bg-surface p-6 shadow-sm transition-shadow hover:shadow-md md:flex-row">
                 <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden rounded-lg bg-surface-container-high md:w-1/3">
-                  {outlet.image ? (
-                    <Image src={outlet.image} alt={outlet.imageAlt ?? `Foto produk ${outlet.name}`} fill className="object-cover" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-surface-container-high text-on-surface-variant">
-                      <span className="material-symbols-outlined text-5xl" aria-hidden="true">storefront</span>
-                    </div>
-                  )}
+                  <Image
+                    src={outlet.image ?? getCategoryThumbnail(outlet.categorySlug)}
+                    alt={outlet.image ? (outlet.imageAlt ?? `Foto produk ${outlet.name}`) : `Ilustrasi kategori ${outlet.category} untuk ${outlet.name} — foto belum tersedia`}
+                    fill
+                    unoptimized={!outlet.image}
+                    className="object-cover"
+                  />
                   <div className={cn("absolute left-3 top-3 flex items-center gap-1 rounded-full px-3 py-1 text-label-caps shadow-sm", outlet.isOpen ? "bg-tertiary text-on-tertiary" : "bg-surface text-on-surface border border-outline")}>
                     <span className="material-symbols-outlined text-[14px]" aria-hidden="true">storefront</span>
                     {outlet.isOpen === null ? "Lihat Jam Buka" : outlet.isOpen ? "Buka" : "Tutup"}

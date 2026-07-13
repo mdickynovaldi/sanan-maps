@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { DashboardNav, userNavItems } from "@/components/layout/dashboard-nav";
 import { createClient } from "@/lib/supabase/client";
+import { getCategoryThumbnail } from "@/lib/thumbnails";
 import { toggleFavorite } from "@/lib/actions/favorites";
 
 type FavoriteOutlet = {
@@ -15,6 +16,7 @@ type FavoriteOutlet = {
   slug: string;
   description: string;
   category: string;
+  categorySlug: string | null;
   image: string | null;
   imageAlt: string | null;
   rating: number | null;
@@ -27,7 +29,7 @@ type FavoriteRow = {
     slug: string;
     name: string;
     description: string;
-    outlet_categories: Array<{ categories: { name: string } | null }> | null;
+    outlet_categories: Array<{ categories: { name: string; slug: string } | null }> | null;
     reviews: Array<{ rating: number; status: string }> | null;
     products: Array<{ image_url: string | null; image_alt: string | null }> | null;
   } | null;
@@ -54,7 +56,7 @@ export default function UserFavoritesPage() {
       const { data, error } = await supabase
         .from("favorites")
         .select(
-          "id, outlet_id, outlets(slug, name, description, outlet_categories(categories(name)), reviews(rating, status), products(image_url, image_alt))",
+          "id, outlet_id, outlets(slug, name, description, outlet_categories(categories(name, slug)), reviews(rating, status), products(image_url, image_alt))",
         )
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
@@ -83,6 +85,7 @@ export default function UserFavoritesPage() {
             slug: outlet.slug,
             description: outlet.description,
             category: outlet.outlet_categories?.[0]?.categories?.name ?? "UMKM",
+            categorySlug: outlet.outlet_categories?.[0]?.categories?.slug ?? null,
             image: photo,
             imageAlt: photoAlt,
             rating,
@@ -139,13 +142,13 @@ export default function UserFavoritesPage() {
             {favorites.map((outlet) => (
               <div key={outlet.id} className="rounded-xl border border-outline-variant bg-surface overflow-hidden shadow-sm">
                 <div className="relative h-48 bg-surface-container-high">
-                  {outlet.image ? (
-                    <Image src={outlet.image} alt={outlet.imageAlt ?? outlet.name} fill className="object-cover" />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-on-surface-variant">
-                      <span className="material-symbols-outlined text-5xl" aria-hidden="true">storefront</span>
-                    </div>
-                  )}
+                  <Image
+                    src={outlet.image ?? getCategoryThumbnail(outlet.categorySlug)}
+                    alt={outlet.image ? (outlet.imageAlt ?? outlet.name) : `Ilustrasi kategori ${outlet.category} untuk ${outlet.name} — foto belum tersedia`}
+                    fill
+                    unoptimized={!outlet.image}
+                    className="object-cover"
+                  />
                 </div>
                 <div className="p-6 space-y-3">
                   <div className="flex items-start justify-between">

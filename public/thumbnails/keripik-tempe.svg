@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Ilustrasi keripik tempe">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFC63A"/>
+      <stop offset="1" stop-color="#E08400"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="#FFF8EC"/>
+  <circle cx="400" cy="340" r="235" fill="#FFDDAF" opacity="0.5"/>
+  <g>
+    <path d="M0 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M100 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M200 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M300 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M400 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M500 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M600 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M700 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+  </g>
+  <!-- Piring -->
+  <ellipse cx="400" cy="446" rx="205" ry="44" fill="#FFFDF7" stroke="#E08400" stroke-width="6"/>
+  <!-- Keripik: kepingan bundar bertumpuk -->
+  <g stroke="#C2410C" stroke-width="5">
+    <circle cx="318" cy="352" r="92" fill="url(#g)"/>
+    <circle cx="482" cy="352" r="92" fill="url(#g)"/>
+    <circle cx="400" cy="292" r="92" fill="url(#g)"/>
+  </g>
+  <!-- Bintik kedelai -->
+  <g fill="#6A4700" opacity="0.45">
+    <ellipse cx="372" cy="268" rx="11" ry="7"/>
+    <ellipse cx="420" cy="252" rx="11" ry="7" transform="rotate(24 420 252)"/>
+    <ellipse cx="400" cy="308" rx="11" ry="7" transform="rotate(-18 400 308)"/>
+    <ellipse cx="438" cy="292" rx="10" ry="6" transform="rotate(40 438 292)"/>
+    <ellipse cx="300" cy="340" rx="11" ry="7" transform="rotate(12 300 340)"/>
+    <ellipse cx="334" cy="382" rx="10" ry="6" transform="rotate(-30 334 382)"/>
+    <ellipse cx="286" cy="384" rx="9" ry="6" transform="rotate(50 286 384)"/>
+    <ellipse cx="500" cy="336" rx="11" ry="7" transform="rotate(-14 500 336)"/>
+    <ellipse cx="466" cy="380" rx="10" ry="6" transform="rotate(28 466 380)"/>
+    <ellipse cx="514" cy="386" rx="9" ry="6" transform="rotate(-42 514 386)"/>
+  </g>
+  <!-- Kilau -->
+  <g stroke="#FFF8EC" stroke-width="7" stroke-linecap="round" opacity="0.8" fill="none">
+    <path d="M356 244a58 58 0 0 1 44-18"/>
+    <path d="M274 314a58 58 0 0 1 44-18"/>
+    <path d="M438 314a58 58 0 0 1 44-18"/>
+  </g>
+</svg>

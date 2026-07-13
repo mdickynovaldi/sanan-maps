@@ -43,6 +43,16 @@ function getSystemTheme(): Theme {
     : "light";
 }
 
+// Hormati preferensi reduksi gerak: toggle aksesibilitas situs (kelas pada
+// <html>) maupun setelan OS. Dicek per pemanggilan karena bisa berubah kapan pun.
+function prefersReducedMotion(): boolean {
+  if (typeof window === "undefined") return false;
+  return (
+    document.documentElement.classList.contains("a11y-reduced-motion") ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
 function useResolvedTheme(themeProp?: "light" | "dark"): Theme {
   const [detectedTheme, setDetectedTheme] = useState<Theme>(
     () => getDocumentTheme() ?? getSystemTheme(),
@@ -808,7 +818,7 @@ function MapControls({
   }, [map]);
 
   const handleResetBearing = useCallback(() => {
-    map?.resetNorthPitch({ duration: 300 });
+    map?.resetNorthPitch({ duration: prefersReducedMotion() ? 0 : 300 });
   }, [map]);
 
   const handleLocate = useCallback(() => {
@@ -826,7 +836,7 @@ function MapControls({
         map?.flyTo({
           center: [coords.longitude, coords.latitude],
           zoom: 16,
-          duration: 1500,
+          duration: prefersReducedMotion() ? 0 : 1500,
         });
         onLocate?.(coords);
         setWaitingForLocation(false);
@@ -1772,6 +1782,7 @@ function MapClusterLayer<
         map.easeTo({
           center: coordinates,
           zoom,
+          duration: prefersReducedMotion() ? 0 : undefined,
         });
       }
     };

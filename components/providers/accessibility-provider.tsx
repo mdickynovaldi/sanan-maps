@@ -7,6 +7,8 @@ export type AccessibilityPreferences = {
   largeText: boolean;
   reducedMotion: boolean;
   defaultListView: boolean;
+  audioGuide: boolean;
+  textDirections: boolean;
 };
 
 const defaultPrefs: AccessibilityPreferences = {
@@ -14,6 +16,8 @@ const defaultPrefs: AccessibilityPreferences = {
   largeText: false,
   reducedMotion: false,
   defaultListView: false,
+  audioGuide: false,
+  textDirections: false,
 };
 
 type AccessibilityContextValue = {

@@ -480,25 +480,51 @@ html.a11y-high-contrast select {
   border-width: 2px !important;
 }
 
-html.a11y-large-text {
-  --text-h1: 44px;
-  --text-h2: 36px;
-  --text-h3: 28px;
-  --text-body-lg: 22px;
-  --text-body-md: 20px;
-  --text-body-sm: 18px;
-  --text-label-caps: 14px;
+/* Header situs (header > nav) memakai kelas Tailwind mentah (slate/amber),
+   bukan token semantik — paksa teks hitam agar mode kontras terlihat juga di
+   kromnya. Scope ke `header > nav` supaya <header> semantik di halaman
+   dashboard (berisi tombol CTA hitam) tidak ikut menjadi hitam-di-atas-hitam. */
+html.a11y-high-contrast header > nav a,
+html.a11y-high-contrast header > nav button {
+  color: #000000 !important;
 }
 
-html.a11y-large-text .material-symbols-outlined {
-  font-size: 1.2em;
+/* Footer bg-slate-900 gelap permanen: putihkan latar dan hitamkan seluruh
+   teks agar tidak ada teks hitam di atas latar gelap. */
+html.a11y-high-contrast footer {
+  background-color: #ffffff !important;
 }
+
+html.a11y-high-contrast footer * {
+  color: #000000 !important;
+}
+
+/* Skala teks: token px kustom di-inline oleh `@theme inline` saat kompilasi,
+   jadi override variabel tidak berpengaruh — timpa kelasnya langsung
+   (aturan tanpa layer menang atas semua @layer Tailwind). Ukuran rem bawaan
+   Tailwind ikut membesar lewat font-size root. */
+html.a11y-large-text {
+  font-size: 112.5%;
+}
+
+html.a11y-large-text .text-h1 { font-size: 44px; }
+html.a11y-large-text .text-h2 { font-size: 36px; }
+html.a11y-large-text .text-h3 { font-size: 28px; }
+html.a11y-large-text .text-body-lg { font-size: 22px; }
+html.a11y-large-text .text-body-md { font-size: 20px; }
+html.a11y-large-text .text-body-sm { font-size: 18px; }
+html.a11y-large-text .text-label-caps { font-size: 14px; }
 
 html.a11y-large-text button,
 html.a11y-large-text input,
 html.a11y-large-text textarea,
 html.a11y-large-text select {
   min-height: 2.75rem;
+}
+
+/* scroll-smooth ada di <html> sendiri; selektor turunan tidak menjangkaunya */
+html.a11y-reduced-motion {
+  scroll-behavior: auto !important;
 }
 
 html.a11y-reduced-motion *,

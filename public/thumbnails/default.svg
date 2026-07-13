@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Ilustrasi warung UMKM Sanan">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFC63A"/>
+      <stop offset="1" stop-color="#E08400"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="#FFF8EC"/>
+  <circle cx="400" cy="340" r="235" fill="#FFDDAF" opacity="0.5"/>
+  <g>
+    <path d="M0 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M100 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M200 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M300 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M400 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M500 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M600 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M700 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+  </g>
+  <ellipse cx="400" cy="512" rx="240" ry="26" fill="#6A4700" opacity="0.08"/>
+  <!-- Fasad warung -->
+  <rect x="240" y="272" width="320" height="196" rx="14" fill="#FFFDF7" stroke="#E08400" stroke-width="6"/>
+  <!-- Kanopi warung -->
+  <path d="M218 206h364l19 62a17 17 0 0 1-16.4 22H215.4A17 17 0 0 1 199 268Z" fill="#C2410C"/>
+  <path d="M290 206l-14 84M364 206l-5 84M436 206l5 84M510 206l14 84" stroke="#FFF8EC" stroke-width="9" stroke-linecap="round"/>
+  <!-- Jendela -->
+  <rect x="272" y="322" width="76" height="60" rx="10" fill="url(#g)"/>
+  <rect x="452" y="322" width="76" height="60" rx="10" fill="url(#g)"/>
+  <!-- Pintu -->
+  <path d="M356 468v-82a44 44 0 0 1 88 0v82" fill="#6A4700"/>
+  <circle cx="420" cy="410" r="7" fill="#FFC63A"/>
+</svg>

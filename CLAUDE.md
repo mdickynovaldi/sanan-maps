@@ -9,21 +9,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 
-## Local Development (Supabase lokal)
+## Local Development (Supabase production)
 
-Proyek Supabase cloud lama (`xifepsqtlxkysxekuxyq`) sudah dihapus. Development
-sekarang memakai Supabase lokal via Docker (kredensial cloud lama tersimpan di
-`.env.local.cloud-backup`):
-
-1. `colima start` (atau pastikan Docker daemon berjalan)
-2. `npx supabase start` — port digeser ke 54331 (API), 54332 (DB), 54333 (Studio),
-   54334 (Mailpit) agar tidak bentrok dengan proyek Supabase lokal lain
-3. `npx tsx --env-file=.env.local scripts/seed-local.ts` — seed kategori, 15 outlet
-   dengan koordinat asli Kampung Sanan, review, produk, panorama demo, dan akun demo
-4. `npm run dev`
-
-Akun demo: `admin@sanan.local`/`admin123456`, `owner@sanan.local`/`owner123456`,
-`budi@sanan.local`/`budi123456`, `siti@sanan.local`/`siti123456`.
+Development dan QC memakai **Supabase production** (project ref
+`nxvsmuhcqepcutiuhbfw`) lewat `.env.local` — cukup `npm run dev`.
+JANGAN nyalakan Colima/Docker/Supabase lokal, dan JANGAN jalankan
+`scripts/seed-local.ts` dengan `.env.local` (akan menyemai data demo ke
+production). Kredensial cloud lama yang sudah mati ada di
+`.env.local.cloud-backup`.
 
 Koordinat referensi Kampung Sanan ada di `lib/geo.ts` (`SANAN_CENTER`,
 bbox Jalan Sanan dari OSM). Panorama 360 dirender dengan pannellum

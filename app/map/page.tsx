@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LngLatBounds } from "maplibre-gl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Header } from "@/components/layout/header";
+import { useAccessibility } from "@/components/providers/accessibility-provider";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import {
@@ -58,6 +60,7 @@ type ActiveRoute = WalkingRoute & {
 /** Fit peta ke seluruh marker sekali saja setelah data outlet masuk. */
 function FitToOutlets({ points }: { points: [number, number][] }) {
   const { map, isLoaded } = useMap();
+  const { prefs } = useAccessibility();
   const fittedRef = useRef(false);
 
   useEffect(() => {
@@ -67,8 +70,8 @@ function FitToOutlets({ points }: { points: [number, number][] }) {
       (b, p) => b.extend(p),
       new LngLatBounds(points[0], points[0]),
     );
-    map.fitBounds(bounds, { padding: 100, maxZoom: 17, duration: 600 });
-  }, [map, isLoaded, points]);
+    map.fitBounds(bounds, { padding: 100, maxZoom: 17, duration: prefs.reducedMotion ? 0 : 600 });
+  }, [map, isLoaded, points, prefs.reducedMotion]);
 
   return null;
 }
@@ -87,6 +90,8 @@ type OutletRow = {
 };
 
 export default function MapPage() {
+  const router = useRouter();
+  const { prefs } = useAccessibility();
   const mapRef = useRef<MapRef | null>(null);
   const [outlets, setOutlets] = useState<MapOutlet[]>([]);
   const [selectedOutletId, setSelectedOutletId] = useState<string>("");
@@ -101,6 +106,17 @@ export default function MapPage() {
   const [routeErrorMaps, setRouteErrorMaps] = useState<string | null>(null);
   // Penanda permintaan rute terbaru — respons lama yang datang terlambat diabaikan.
   const routeRequestRef = useRef(0);
+
+  // Preferensi "Mode Daftar": arahkan ke daftar outlet aksesibel, kecuali
+  // pengguna sengaja membuka peta lewat ?view=map. Query string dibaca dari
+  // window (bukan useSearchParams) agar halaman tidak butuh Suspense boundary.
+  useEffect(() => {
+    if (!prefs.defaultListView) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("view") !== "map") {
+      router.replace("/outlets");
+    }
+  }, [prefs.defaultListView, router]);
 
   useEffect(() => {
     async function load() {
@@ -192,7 +208,7 @@ export default function MapPage() {
     mapRef.current?.flyTo({
       center: [outlet.longitude, outlet.latitude],
       zoom: 17,
-      duration: 900,
+      duration: prefs.reducedMotion ? 0 : 900,
       essential: true,
     });
   };
@@ -252,7 +268,7 @@ export default function MapPage() {
           (b, p) => b.extend(p),
           new LngLatBounds(result.coordinates[0], result.coordinates[0]),
         );
-        mapRef.current?.fitBounds(bounds, { padding: 100, duration: 800 });
+        mapRef.current?.fitBounds(bounds, { padding: 100, duration: prefs.reducedMotion ? 0 : 800 });
       } catch (e) {
         if (requestId === routeRequestRef.current) {
           setStatusMessage(e instanceof Error ? e.message : "Gagal menampilkan rute.");
@@ -264,7 +280,7 @@ export default function MapPage() {
         }
       }
     },
-    [userLocation, requestLocation],
+    [userLocation, requestLocation, prefs.reducedMotion],
   );
 
   const clearRoute = useCallback(() => {

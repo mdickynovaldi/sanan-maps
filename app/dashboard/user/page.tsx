@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DashboardNav, userNavItems } from "@/components/layout/dashboard-nav";
 import { createClient } from "@/lib/supabase/client";
 import { getUserFavorites } from "@/lib/actions/favorites";
+import { DEFAULT_THUMBNAIL } from "@/lib/thumbnails";
 
 type AccessibilityPreferences = {
   highContrast?: boolean;
@@ -198,8 +199,8 @@ export default function UserDashboardPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {favorites.slice(0, 4).map((outlet) => (
                       <Card key={outlet.id} className="overflow-hidden">
-                        <div className="relative h-32 flex items-center justify-center bg-surface-container-high">
-                          <span className="material-symbols-outlined text-4xl text-on-surface-variant" aria-hidden="true">storefront</span>
+                        <div className="relative h-32 bg-surface-container-high">
+                          <Image src={DEFAULT_THUMBNAIL} alt={`Ilustrasi outlet ${outlet.name}`} fill unoptimized className="object-cover" />
                         </div>
                         <CardContent className="p-3">
                           <h4 className="font-semibold text-on-surface">{outlet.name}</h4>

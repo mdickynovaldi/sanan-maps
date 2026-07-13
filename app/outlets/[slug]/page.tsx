@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useParams } from "next/navigation";
 import { createClient as createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { isOutletOpenNow } from "@/lib/geo";
+import { DEFAULT_THUMBNAIL, getCategoryThumbnail } from "@/lib/thumbnails";
 import { createReport } from "@/lib/actions/reports";
 import { ReviewForm } from "@/components/features/review-form";
 import { FavoriteButton } from "@/components/features/favorite-button";
@@ -60,14 +61,18 @@ const reportTypeMap: Record<string, string> = {
   "Lainnya": "other",
 };
 
-/** Sel foto hero: tampilkan foto produk bila ada, jika tidak placeholder netral. */
-function HeroPhoto({ src, alt, priority = false, className }: { src: string | null; alt: string; priority?: boolean; className?: string }) {
+/** Sel foto hero: tampilkan foto produk bila ada, jika tidak thumbnail bertema. */
+function HeroPhoto({ src, alt, fallbackSrc, priority = false, className }: { src: string | null; alt: string; fallbackSrc?: string; priority?: boolean; className?: string }) {
   if (!src) {
     return (
-      <div className={`flex h-full w-full items-center justify-center bg-surface-container-high text-on-surface-variant ${className ?? ""}`}>
-        <span className="material-symbols-outlined text-5xl" aria-hidden="true">storefront</span>
-        <span className="sr-only">{alt}</span>
-      </div>
+      <Image
+        src={fallbackSrc ?? DEFAULT_THUMBNAIL}
+        alt={`Ilustrasi — ${alt} belum tersedia`}
+        fill
+        priority={priority}
+        unoptimized
+        className={`object-cover ${className ?? ""}`}
+      />
     );
   }
   return (
@@ -85,6 +90,7 @@ export default function OutletDetailPage() {
   const [notFound, setNotFound] = useState(false);
 
   const [outlet, setOutlet] = useState<OutletData | null>(null);
+  const [categorySlug, setCategorySlug] = useState<string | null>(null);
   const [products, setProducts] = useState<ProductData[]>([]);
   const [reviews, setReviews] = useState<ReviewData[]>([]);
   const [panoramas, setPanoramas] = useState<PanoramaData[]>([]);
@@ -106,13 +112,16 @@ export default function OutletDetailPage() {
       // sedangkan admin/owner tetap bisa membuka pratinjau outlet pending.
       const { data: outletData } = await supabase
         .from("outlets")
-        .select("*")
+        .select("*, outlet_categories(categories(slug))")
         .eq("slug", slug)
         .single();
 
       if (outletData) {
-        const o = outletData as unknown as OutletData;
+        const o = outletData as unknown as OutletData & {
+          outlet_categories?: Array<{ categories: { slug: string } | null }> | null;
+        };
         setOutlet(o);
+        setCategorySlug(o.outlet_categories?.[0]?.categories?.slug ?? null);
 
         const [{ data: prods }, { data: revs }, { data: panos }] = await Promise.all([
           supabase.from("products").select("*").eq("outlet_id", o.id).order("name"),
@@ -199,13 +208,13 @@ export default function OutletDetailPage() {
             <div className="lg:col-span-7">
               <div className="grid h-[400px] grid-cols-2 grid-rows-2 gap-2 overflow-hidden rounded-xl">
                 <div className="relative col-span-2 row-span-1 md:col-span-1 md:row-span-2 group bg-surface-container-high">
-                  <HeroPhoto src={products[0]?.image_url ?? null} alt={products[0]?.image_alt || `Foto utama ${outlet.name}`} priority />
+                  <HeroPhoto src={products[0]?.image_url ?? null} alt={products[0]?.image_alt || `Foto utama ${outlet.name}`} fallbackSrc={getCategoryThumbnail(categorySlug)} priority />
                 </div>
                 <div className="relative hidden group md:block bg-surface-container-high">
-                  <HeroPhoto src={products[1]?.image_url ?? null} alt={products[1]?.image_alt || `Produk ${outlet.name}`} />
+                  <HeroPhoto src={products[1]?.image_url ?? null} alt={products[1]?.image_alt || `Produk ${outlet.name}`} fallbackSrc={getCategoryThumbnail(categorySlug)} />
                 </div>
                 <div className="relative hidden group md:block bg-surface-container-high">
-                  <HeroPhoto src={products[2]?.image_url ?? null} alt={products[2]?.image_alt || `Etalase ${outlet.name}`} />
+                  <HeroPhoto src={products[2]?.image_url ?? null} alt={products[2]?.image_alt || `Etalase ${outlet.name}`} fallbackSrc={getCategoryThumbnail(categorySlug)} />
                 </div>
               </div>
             </div>
@@ -344,13 +353,13 @@ export default function OutletDetailPage() {
                 {products.map((product) => (
                   <Card key={product.id}>
                     <div className="relative h-48 bg-surface-container-high">
-                      {product.image_url ? (
-                        <Image src={product.image_url} alt={product.image_alt ?? product.name} fill className="object-cover rounded-t-xl" />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-on-surface-variant">
-                          <span className="material-symbols-outlined text-5xl">image</span>
-                        </div>
-                      )}
+                      <Image
+                        src={product.image_url ?? getCategoryThumbnail(categorySlug)}
+                        alt={product.image_url ? (product.image_alt ?? product.name) : `Ilustrasi produk ${product.name} — foto belum tersedia`}
+                        fill
+                        unoptimized={!product.image_url}
+                        className="object-cover rounded-t-xl"
+                      />
                       {!product.is_available && (
                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-t-xl">
                           <span className="text-white font-semibold">Habis</span>

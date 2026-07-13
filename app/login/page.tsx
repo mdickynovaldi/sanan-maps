@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/ui/password-input";
 import { signIn } from "@/lib/actions/auth";
 
 export default function LoginPage() {
@@ -129,15 +130,14 @@ function LoginPageInner() {
                     <label htmlFor="password" className="text-label-caps text-on-surface uppercase">Password</label>
                     <Link href="/forgot-password" className="text-body-sm text-primary hover:underline">Forgot?</Link>
                   </div>
-                  <input
+                  <PasswordInput
                     ref={passwordRef}
                     id="password"
                     name="password"
-                    type="password"
                     placeholder="Masukkan password"
+                    autoComplete="current-password"
                     aria-invalid={Boolean(fieldErrors.password)}
                     aria-describedby={getDescribedBy(passwordErrorId, errorId)}
-                    className="h-10 px-3 py-2 rounded-md border border-outline-variant bg-surface-container-lowest text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary"
                   />
                   {fieldErrors.password && (
                     <p id={passwordErrorId} className="text-body-sm text-error" role="alert" aria-live="polite">

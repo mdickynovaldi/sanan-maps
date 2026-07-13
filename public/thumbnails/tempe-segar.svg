@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Ilustrasi tempe segar">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFC63A"/>
+      <stop offset="1" stop-color="#E08400"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="#FFF8EC"/>
+  <circle cx="400" cy="340" r="235" fill="#FFDDAF" opacity="0.5"/>
+  <g>
+    <path d="M0 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M100 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M200 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M300 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M400 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M500 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M600 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M700 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+  </g>
+  <ellipse cx="400" cy="478" rx="230" ry="26" fill="#6A4700" opacity="0.08"/>
+  <!-- Ujung bungkus daun (kiri & kanan) -->
+  <path d="M292 300l-84 60 84 60Z" fill="#FFDDAF" stroke="#C2410C" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M508 300l84 60-84 60Z" fill="#FFDDAF" stroke="#C2410C" stroke-width="6" stroke-linejoin="round"/>
+  <!-- Balok tempe -->
+  <rect x="276" y="288" width="248" height="144" rx="16" fill="#FFFDF7" stroke="#E08400" stroke-width="6"/>
+  <!-- Butir kedelai -->
+  <g fill="url(#g)" stroke="#6A4700" stroke-width="3">
+    <ellipse cx="322" cy="322" rx="15" ry="10"/>
+    <ellipse cx="372" cy="316" rx="15" ry="10" transform="rotate(18 372 316)"/>
+    <ellipse cx="424" cy="322" rx="15" ry="10" transform="rotate(-14 424 322)"/>
+    <ellipse cx="474" cy="318" rx="15" ry="10" transform="rotate(10 474 318)"/>
+    <ellipse cx="346" cy="360" rx="15" ry="10" transform="rotate(-20 346 360)"/>
+    <ellipse cx="398" cy="362" rx="15" ry="10" transform="rotate(14 398 362)"/>
+    <ellipse cx="450" cy="360" rx="15" ry="10" transform="rotate(-8 450 360)"/>
+    <ellipse cx="324" cy="398" rx="15" ry="10" transform="rotate(12 324 398)"/>
+    <ellipse cx="376" cy="402" rx="15" ry="10" transform="rotate(-16 376 402)"/>
+    <ellipse cx="428" cy="398" rx="15" ry="10" transform="rotate(20 428 398)"/>
+    <ellipse cx="478" cy="400" rx="15" ry="10" transform="rotate(-10 478 400)"/>
+  </g>
+  <!-- Tali pengikat -->
+  <path d="M400 288v144" stroke="#C2410C" stroke-width="10"/>
+  <path d="M382 276c10-12 26-12 36 0-10 12-26 12-36 0Z" fill="#C2410C"/>
+</svg>

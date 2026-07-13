@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/ui/password-input";
 import { signUp } from "@/lib/actions/auth";
 
 type FieldErrors = {
@@ -183,13 +184,12 @@ export default function RegisterPage() {
                 {/* Password */}
                 <div className="flex flex-col gap-2">
                   <label htmlFor="password" className="text-label-caps text-on-surface uppercase">Password</label>
-                  <input
+                  <PasswordInput
                     ref={passwordRef}
                     id="password"
                     name="password"
-                    type="password"
                     placeholder="Create a password"
-                    className="h-10 px-3 py-2 rounded-md border border-outline-variant bg-surface-container-lowest text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary"
+                    autoComplete="new-password"
                     {...fieldProps("password")}
                   />
                   {fieldErrors.password && <p id="register-password-error" className="text-body-sm text-error" role="alert">{fieldErrors.password}</p>}
@@ -198,13 +198,12 @@ export default function RegisterPage() {
                 {/* Confirm Password */}
                 <div className="flex flex-col gap-2">
                   <label htmlFor="confirmPassword" className="text-label-caps text-on-surface uppercase">Confirm Password</label>
-                  <input
+                  <PasswordInput
                     ref={confirmRef}
                     id="confirmPassword"
                     name="confirmPassword"
-                    type="password"
                     placeholder="Confirm your password"
-                    className="h-10 px-3 py-2 rounded-md border border-outline-variant bg-surface-container-lowest text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary"
+                    autoComplete="new-password"
                     {...fieldProps("confirmPassword")}
                   />
                   {fieldErrors.confirmPassword && <p id="register-confirmPassword-error" className="text-body-sm text-error" role="alert">{fieldErrors.confirmPassword}</p>}

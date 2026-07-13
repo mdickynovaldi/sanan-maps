@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Ilustrasi kuliner hangat">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFC63A"/>
+      <stop offset="1" stop-color="#E08400"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="#FFF8EC"/>
+  <circle cx="400" cy="340" r="235" fill="#FFDDAF" opacity="0.5"/>
+  <g>
+    <path d="M0 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M100 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M200 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M300 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M400 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M500 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+    <path d="M600 0h100v36a50 50 0 0 1-100 0z" fill="#C2410C"/>
+    <path d="M700 0h100v36a50 50 0 0 1-100 0z" fill="#FFDDAF"/>
+  </g>
+  <ellipse cx="400" cy="502" rx="220" ry="25" fill="#6A4700" opacity="0.08"/>
+  <!-- Uap -->
+  <g stroke="#E08400" stroke-width="11" stroke-linecap="round" fill="none" opacity="0.8">
+    <path d="M348 282c-14-24 14-36 0-64"/>
+    <path d="M400 268c-14-24 14-36 0-64"/>
+    <path d="M452 282c-14-24 14-36 0-64"/>
+  </g>
+  <!-- Mangkuk -->
+  <path d="M258 330a142 142 0 0 0 284 0Z" fill="#C2410C"/>
+  <ellipse cx="400" cy="330" rx="142" ry="24" fill="#FFFDF7" stroke="#E08400" stroke-width="6"/>
+  <!-- Isi -->
+  <ellipse cx="400" cy="330" rx="118" ry="16" fill="url(#g)"/>
+  <!-- Kaki mangkuk -->
+  <path d="M362 472h76v14a10 10 0 0 1-10 10h-56a10 10 0 0 1-10-10Z" fill="#C2410C"/>
+  <!-- Sendok -->
+  <g transform="rotate(-24 560 300)">
+    <rect x="552" y="256" width="16" height="120" rx="8" fill="#6A4700"/>
+    <ellipse cx="560" cy="244" rx="26" ry="32" fill="#6A4700"/>
+  </g>
+</svg>
