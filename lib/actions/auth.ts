@@ -93,9 +93,10 @@ export async function signUp(formData: FormData): Promise<ActionResult> {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Input tidak valid" };
   }
 
-  // Rate limit: 3 pendaftaran per 10 menit per IP (cegah pembuatan akun massal)
+  // Rate limit: 10 pendaftaran per 10 menit per IP (cegah pembuatan akun massal;
+  // dilonggarkan dari 3 agar tidak mengganggu fase QC/testing dari satu IP)
   const ip = await getClientIp();
-  const rl = await checkRateLimit("signup", ip, 3, 600);
+  const rl = await checkRateLimit("signup", ip, 10, 600);
   if (!rl.success) {
     return { success: false, error: "Terlalu banyak percobaan pendaftaran. Coba lagi nanti." };
   }
