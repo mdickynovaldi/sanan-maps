@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sanan UMKM Maps — Portfolio Screenshots</title>
+<style>
+  :root {
+    --bg:#faf6f0; --card:#fff; --ink:#1a1206; --muted:#7a6a55; --accent:#f5a623;
+    --line:#ece2d4; --shadow:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#14100b; --card:#1e1811; --ink:#f5efe6; --muted:#a8977f; --line:#2c241a; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+  header{padding:48px 32px 24px;max-width:1200px;margin:0 auto;}
+  h1{font-size:2rem;margin:0 0 6px;letter-spacing:-.02em;}
+  .sub{color:var(--muted);font-size:1.02rem;margin:0;}
+  .meta{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;}
+  .chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.82rem;color:var(--muted);box-shadow:var(--shadow);}
+  main{max-width:1200px;margin:0 auto;padding:8px 32px 64px;}
+  section{margin-top:40px;}
+  .sec-head{display:flex;align-items:baseline;gap:12px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:20px;}
+  .sec-head h2{font-size:1.25rem;margin:0;}
+  .sec-head .count{color:var(--muted);font-size:.85rem;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
+  figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);transition:transform .15s ease;}
+  figure:hover{transform:translateY(-3px);}
+  a.shot{display:block;background:var(--bg);}
+  a.shot img{display:block;width:100%;height:200px;object-fit:cover;object-position:top;border-bottom:1px solid var(--line);}
+  figcaption{padding:12px 14px;}
+  figcaption .t{font-weight:600;font-size:.95rem;}
+  figcaption .p{color:var(--muted);font-size:.8rem;margin-top:2px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Sanan UMKM Maps</h1>
+  <p class="sub">Screenshot portofolio — platform pemetaan UMKM Kampung Sanan, Malang (aksesibilitas-first, WCAG 2.2 AA).</p>
+  <div class="meta">
+    <span class="chip">Next.js 16 App Router</span>
+    <span class="chip">React 19 · Tailwind 4</span>
+    <span class="chip">Supabase (Auth · RLS)</span>
+    <span class="chip">MapLibre GL · Pannellum 360°</span>
+    <span class="chip">29 halaman · viewport 1440×900 @2×</span>
+  </div>
+</header>
+<main id="app"></main>
+<script>
+const SECTIONS = [
+  { key:"01-public", title:"Halaman Publik", items:[
+    ["01-home","Beranda","/"],
+    ["02-map","Peta Interaktif","/map"],
+    ["03-outlets-list","Daftar Outlet (Aksesibel)","/outlets"],
+    ["04-outlet-detail","Detail Outlet — Keripik Tempe","/outlets/keripik-tempe-berkah-jaya"],
+    ["05-outlet-detail-2","Detail Outlet — Es Cendol","/outlets/es-cendol-segar-bu-rina"],
+    ["06-about","Tentang","/about"],
+    ["07-accessibility","Pernyataan Aksesibilitas","/accessibility"],
+    ["08-contact","Kontak","/contact"],
+    ["09-privacy","Kebijakan Privasi","/privacy"],
+    ["10-login","Login","/login"],
+    ["11-register","Registrasi","/register"],
+    ["12-forgot-password","Lupa Password","/forgot-password"],
+  ]},
+  { key:"02-user", title:"Dashboard Pengguna", items:[
+    ["01-dashboard","Ringkasan Pengguna","/dashboard/user"],
+    ["02-favorites","Outlet Favorit","/dashboard/user/favorites"],
+    ["03-reviews","Ulasan Saya","/dashboard/user/reviews"],
+    ["04-settings","Preferensi & Aksesibilitas","/dashboard/user/settings"],
+  ]},
+  { key:"03-owner", title:"Dashboard Pemilik UMKM (Owner)", items:[
+    ["01-dashboard","My Outlet — Profil Toko","/dashboard/owner"],
+    ["02-products","Kelola Produk","/dashboard/owner/products"],
+    ["03-panoramas","Panorama 360°","/dashboard/owner/panoramas"],
+    ["04-reviews","Ulasan Masuk","/dashboard/owner/reviews"],
+  ]},
+  { key:"04-admin", title:"Dashboard Admin", items:[
+    ["01-dashboard","System Overview","/dashboard/admin"],
+    ["02-analytics","Analitik","/dashboard/admin/analytics"],
+    ["03-outlets","Kelola Outlet","/dashboard/admin/outlets"],
+    ["04-products","Kelola Produk","/dashboard/admin/products"],
+    ["05-categories","Kategori","/dashboard/admin/categories"],
+    ["06-panoramas","Panorama 360°","/dashboard/admin/panoramas"],
+    ["07-reviews","Moderasi Ulasan","/dashboard/admin/reviews"],
+    ["08-reports","Laporan Data","/dashboard/admin/reports"],
+    ["09-users","Kelola Pengguna","/dashboard/admin/users"],
+  ]},
+];
+const app = document.getElementById("app");
+for (const s of SECTIONS){
+  const sec = document.createElement("section");
+  sec.innerHTML = `<div class="sec-head"><h2>${s.title}</h2><span class="count">${s.items.length} halaman</span></div>`;
+  const grid = document.createElement("div"); grid.className="grid";
+  for (const [file,title,path] of s.items){
+    const src = `${s.key}/${file}.png`;
+    const fig = document.createElement("figure");
+    fig.innerHTML = `<a class="shot" href="${src}" target="_blank" rel="noopener"><img loading="lazy" src="${src}" alt="${title}"></a>`+
+      `<figcaption><div class="t">${title}</div><div class="p">${path}</div></figcaption>`;
+    grid.appendChild(fig);
+  }
+  sec.appendChild(grid); app.appendChild(sec);
+}
+</script>
+</body>
+</html>
