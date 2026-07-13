@@ -55,6 +55,49 @@ export default function OutletsPage() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState<SortOption>("rating");
+  // ID outlet yang ringkasannya sedang dibacakan via Web Speech API
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+
+  const speakSummary = useCallback((outlet: OutletItem) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      setError("Browser Anda tidak mendukung fitur baca suara.");
+      return;
+    }
+    const synth = window.speechSynthesis;
+    if (speakingId === outlet.id) {
+      synth.cancel();
+      setSpeakingId(null);
+      return;
+    }
+    synth.cancel();
+
+    const parts = [
+      `${outlet.name}.`,
+      `Kategori ${outlet.category}.`,
+      outlet.rating !== null
+        ? `Rating ${outlet.rating} dari 5, berdasarkan ${outlet.reviewCount} ulasan.`
+        : "Belum ada ulasan.",
+      outlet.isOpen === true ? "Saat ini buka." : outlet.isOpen === false ? "Saat ini tutup." : "",
+      outlet.description,
+      `Informasi aksesibilitas: ${outlet.accessibility}`,
+      outlet.landmark,
+    ];
+    const utterance = new SpeechSynthesisUtterance(parts.filter(Boolean).join(" "));
+    utterance.lang = "id-ID";
+    utterance.onend = () => setSpeakingId(null);
+    utterance.onerror = () => setSpeakingId(null);
+    setSpeakingId(outlet.id);
+    synth.speak(utterance);
+  }, [speakingId]);
+
+  // Hentikan pembacaan saat meninggalkan halaman
+  useEffect(() => {
+    return () => {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -286,9 +329,17 @@ export default function OutletsPage() {
                     <p className="text-body-sm text-on-surface-variant mt-2 italic">{outlet.landmark}</p>
                   </div>
                   <div className="mt-auto flex flex-wrap gap-3 border-t border-outline-variant pt-4">
-                    <Button variant="outline" className="border-primary text-primary">
-                      <span className="material-symbols-outlined" aria-hidden="true">volume_up</span>
-                      Dengarkan Ringkasan
+                    <Button
+                      variant="outline"
+                      className="border-primary text-primary"
+                      onClick={() => speakSummary(outlet)}
+                      aria-pressed={speakingId === outlet.id}
+                      aria-label={speakingId === outlet.id ? `Berhenti membacakan ringkasan ${outlet.name}` : `Dengarkan ringkasan ${outlet.name}`}
+                    >
+                      <span className="material-symbols-outlined" aria-hidden="true">
+                        {speakingId === outlet.id ? "stop_circle" : "volume_up"}
+                      </span>
+                      {speakingId === outlet.id ? "Berhenti" : "Dengarkan Ringkasan"}
                     </Button>
                     <Button asChild className="bg-primary-container text-on-primary-container">
                       <Link href={`/outlets/${outlet.slug}`}>

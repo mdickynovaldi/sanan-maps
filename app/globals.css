@@ -501,11 +501,19 @@ html.a11y-high-contrast footer * {
 
 /* Skala teks: token px kustom di-inline oleh `@theme inline` saat kompilasi,
    jadi override variabel tidak berpengaruh — timpa kelasnya langsung
-   (aturan tanpa layer menang atas semua @layer Tailwind). Ukuran rem bawaan
-   Tailwind ikut membesar lewat font-size root. */
-html.a11y-large-text {
-  font-size: 112.5%;
-}
+   (aturan tanpa layer menang atas semua @layer Tailwind). Ukuran stock
+   Tailwind di-override per kelas, BUKAN lewat font-size root, supaya lebar
+   layout berbasis rem tidak ikut membesar dan memotong UI. Line-height
+   Tailwind 4 berupa rasio, jadi ikut menyesuaikan otomatis. */
+html.a11y-large-text .text-xs { font-size: 14px; }
+html.a11y-large-text .text-sm { font-size: 16px; }
+html.a11y-large-text .text-base { font-size: 18px; }
+html.a11y-large-text .text-lg { font-size: 21px; }
+html.a11y-large-text .text-xl { font-size: 23px; }
+html.a11y-large-text .text-2xl { font-size: 28px; }
+html.a11y-large-text .text-3xl { font-size: 34px; }
+html.a11y-large-text .text-4xl { font-size: 42px; }
+html.a11y-large-text .text-5xl { font-size: 54px; }
 
 html.a11y-large-text .text-h1 { font-size: 44px; }
 html.a11y-large-text .text-h2 { font-size: 36px; }

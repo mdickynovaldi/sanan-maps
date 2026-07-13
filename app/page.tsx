@@ -144,8 +144,9 @@ export default function Home() {
 
               <div className="flex flex-wrap items-center gap-4">
                 <Button asChild className="rounded-full bg-primary-container px-6 py-6 text-label-caps text-on-primary-container hover:bg-primary-container/90">
-                  {/* ?view=map = niat eksplisit membuka peta, melewati preferensi Mode Daftar */}
-                  <Link href="/map?view=map">
+                  {/* Saat Mode Daftar aktif, /map dialihkan ke /outlets; dari sana
+                      tombol "Buka Mode Peta" (?view=map) tetap membuka peta. */}
+                  <Link href="/map">
                     <span className="material-symbols-outlined text-[18px]" aria-hidden="true">map</span>
                     Buka Peta
                   </Link>
