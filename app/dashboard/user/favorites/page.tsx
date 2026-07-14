@@ -15,6 +15,9 @@ type FavoriteOutlet = {
   name: string;
   slug: string;
   description: string;
+  address: string;
+  latitude: number;
+  longitude: number;
   category: string;
   categorySlug: string | null;
   image: string | null;
@@ -29,6 +32,9 @@ type FavoriteRow = {
     slug: string;
     name: string;
     description: string;
+    address: string;
+    latitude: number;
+    longitude: number;
     outlet_categories: Array<{ categories: { name: string; slug: string } | null }> | null;
     reviews: Array<{ rating: number; status: string }> | null;
     products: Array<{ image_url: string | null; image_alt: string | null }> | null;
@@ -56,7 +62,7 @@ export default function UserFavoritesPage() {
       const { data, error } = await supabase
         .from("favorites")
         .select(
-          "id, outlet_id, outlets(slug, name, description, outlet_categories(categories(name, slug)), reviews(rating, status), products(image_url, image_alt))",
+          "id, outlet_id, outlets(slug, name, description, address, latitude, longitude, outlet_categories(categories(name, slug)), reviews(rating, status), products(image_url, image_alt))",
         )
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
@@ -84,6 +90,9 @@ export default function UserFavoritesPage() {
             name: outlet.name,
             slug: outlet.slug,
             description: outlet.description,
+            address: outlet.address,
+            latitude: Number(outlet.latitude),
+            longitude: Number(outlet.longitude),
             category: outlet.outlet_categories?.[0]?.categories?.name ?? "UMKM",
             categorySlug: outlet.outlet_categories?.[0]?.categories?.slug ?? null,
             image: photo,
@@ -167,14 +176,31 @@ export default function UserFavoritesPage() {
                     </Button>
                   </div>
                   <p className="text-body-sm text-on-surface-variant line-clamp-2">{outlet.description}</p>
-                  <div className="flex items-center justify-between pt-2 border-t border-outline-variant">
+                  <p className="flex items-start gap-1.5 text-body-sm text-on-surface-variant">
+                    <span className="material-symbols-outlined text-[16px] mt-0.5 shrink-0" aria-hidden="true">location_on</span>
+                    <span className="line-clamp-2">{outlet.address}</span>
+                  </p>
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-outline-variant">
                     <div className="flex items-center gap-1">
                       <span className="material-symbols-outlined text-sm text-primary-container" style={{ fontVariationSettings: '"FILL" 1' }} aria-hidden="true">star</span>
                       <span className="text-body-sm text-on-surface">{outlet.rating !== null ? outlet.rating : "–"}</span>
                     </div>
-                    <Link href={`/outlets/${outlet.slug}`}>
-                      <Button size="sm">Lihat Detail</Button>
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Button asChild size="sm" variant="outline">
+                        <a
+                          href={`https://www.google.com/maps/dir/?api=1&destination=${outlet.latitude},${outlet.longitude}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Arahkan ke ${outlet.name}`}
+                        >
+                          <span className="material-symbols-outlined text-sm" aria-hidden="true">directions</span>
+                          Arahkan
+                        </a>
+                      </Button>
+                      <Button asChild size="sm">
+                        <Link href={`/outlets/${outlet.slug}`}>Lihat Detail</Link>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>

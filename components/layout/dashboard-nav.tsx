@@ -62,7 +62,9 @@ export function DashboardNav({ title, subtitle, items, cta }: DashboardNavProps)
     </nav>
 
     <nav className="hidden md:flex fixed left-0 top-0 h-full w-[280px] border-r border-slate-200 bg-slate-50 p-4 flex-col gap-2 z-40 overflow-y-auto">
-      <Link href="/" className="mb-6 flex items-center gap-2.5 px-4 py-2">
+      {/* Logo mengarah ke beranda dashboard, BUKAN situs publik — klik logo
+          sempat dikira "auto logout" karena melempar user keluar dashboard. */}
+      <Link href={items[0]?.href ?? "/"} className="mb-6 flex items-center gap-2.5 px-4 py-2">
         <Logo className="h-9 w-9 shrink-0" />
         <div>
           <h1 className="text-lg font-black text-slate-900 font-heading leading-tight">{title}</h1>
@@ -105,6 +107,14 @@ export function DashboardNav({ title, subtitle, items, cta }: DashboardNavProps)
           </Link>
         </Button>
       ) : null}
+
+      <Link
+        href="/"
+        className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-600 hover:bg-slate-200 transition-colors"
+      >
+        <span className="material-symbols-outlined">public</span>
+        <span>Lihat Situs</span>
+      </Link>
 
       <form action={signOut} className="mt-2">
         <Button type="submit" variant="ghost" className="w-full text-sm text-red-600 hover:bg-red-50 justify-start gap-3 px-4 py-3">

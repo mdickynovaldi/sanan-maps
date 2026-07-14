@@ -95,7 +95,7 @@ export function AccessibilityWidget() {
       {open && (
         <div
           ref={panelRef}
-          className="absolute bottom-16 right-0 w-80 rounded-xl border border-outline-variant bg-surface p-6 shadow-[var(--shadow-level-2)]"
+          className="absolute bottom-16 right-0 w-80 max-w-[calc(100vw-3rem)] max-h-[calc(100vh-7rem)] overflow-y-auto rounded-xl border border-outline-variant bg-surface p-6 shadow-[var(--shadow-level-2)]"
           role="dialog"
           aria-modal="true"
           aria-label="Pengaturan Aksesibilitas"

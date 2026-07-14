@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { checkStreetViewCoverage } from "@/lib/actions/street-view-coverage";
 
 interface StreetViewCheckerProps {
   latitude?: number | null;
@@ -10,97 +9,70 @@ interface StreetViewCheckerProps {
   onResult?: (available: boolean) => void;
 }
 
+/**
+ * Pratinjau Google Street View langsung via embed keyless — TANPA API key.
+ * Memakai URL embed yang sama dengan viewer publik di halaman detail outlet,
+ * jadi apa yang tampil di sini persis yang dilihat pengunjung.
+ */
 export function StreetViewChecker({ latitude, longitude, onResult }: StreetViewCheckerProps) {
-  const [checking, setChecking] = useState(false);
-  const [result, setResult] = useState<{
-    available: boolean;
-    panoId?: string;
-    location?: { lat: number; lng: number };
-    error?: string;
-  } | null>(null);
-
-  async function handleCheck() {
-    if (!latitude || !longitude) return;
-
-    setChecking(true);
-    setResult(null);
-
-    const coverage = await checkStreetViewCoverage(latitude, longitude);
-    setResult(coverage);
-    onResult?.(coverage.available);
-    setChecking(false);
-  }
-
+  const [showPreview, setShowPreview] = useState(false);
   const hasCoordinates = latitude != null && longitude != null;
+
+  // Embed keyless selalu bisa dicoba selama koordinat ada.
+  useEffect(() => {
+    onResult?.(hasCoordinates);
+  }, [hasCoordinates, onResult]);
+
+  const embedUrl = hasCoordinates
+    ? `https://maps.google.com/maps?q=${latitude},${longitude}&layer=c&cbll=${latitude},${longitude}&cbp=11,0,0,0,0&ie=UTF8&source=embed&output=svembed`
+    : null;
+  const mapsUrl = hasCoordinates
+    ? `https://maps.google.com/maps?q=${latitude},${longitude}&layer=c&cbll=${latitude},${longitude}`
+    : null;
 
   return (
     <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-4 space-y-3">
       <div className="flex items-center gap-2">
         <span className="material-symbols-outlined text-primary">streetview</span>
-        <h4 className="font-heading text-body-lg text-on-surface">Street View Coverage</h4>
+        <h4 className="font-heading text-body-lg text-on-surface">Google Street View</h4>
       </div>
 
       {!hasCoordinates ? (
         <p className="text-body-sm text-on-surface-variant">
-          Koordinat outlet diperlukan untuk mengecek coverage Street View.
+          Koordinat outlet diperlukan untuk menampilkan Street View.
         </p>
       ) : (
         <>
           <p className="text-body-sm text-on-surface-variant">
-            Cek apakah Google Street View tersedia di lokasi ({latitude?.toFixed(4)}, {longitude?.toFixed(4)})
+            Terhubung langsung ke Google Street View (tanpa API key) di lokasi ({latitude?.toFixed(4)}, {longitude?.toFixed(4)}).
+            Tab &quot;360 View&quot; halaman outlet otomatis menampilkan ini bila belum ada panorama 360 kustom.
           </p>
 
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleCheck}
-            disabled={checking}
-          >
-            {checking ? (
-              <>
-                <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>
-                Mengecek...
-              </>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-sm">search</span>
-                Cek Coverage
-              </>
-            )}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => setShowPreview((v) => !v)}>
+              <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                {showPreview ? "visibility_off" : "visibility"}
+              </span>
+              {showPreview ? "Sembunyikan Pratinjau" : "Tampilkan Pratinjau"}
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <a href={mapsUrl!} target="_blank" rel="noopener noreferrer">
+                <span className="material-symbols-outlined text-sm" aria-hidden="true">open_in_new</span>
+                Buka di Google Maps
+              </a>
+            </Button>
+          </div>
 
-          {result && (
-            <div className={`rounded-lg p-3 ${result.available ? "bg-tertiary/10" : "bg-surface-container-high"}`}>
-              {result.available ? (
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-tertiary">
-                    <span className="material-symbols-outlined text-sm">check_circle</span>
-                    <span className="text-body-sm font-semibold">Street View Tersedia!</span>
-                  </div>
-                  {result.panoId && (
-                    <p className="text-body-sm text-on-surface-variant">Pano ID: {result.panoId}</p>
-                  )}
-                  {result.location && (
-                    <p className="text-body-sm text-on-surface-variant">
-                      Lokasi terdekat: {result.location.lat.toFixed(6)}, {result.location.lng.toFixed(6)}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-on-surface-variant">
-                    <span className="material-symbols-outlined text-sm">info</span>
-                    <span className="text-body-sm font-semibold">Street View Tidak Tersedia</span>
-                  </div>
-                  {result.error && (
-                    <p className="text-body-sm text-error">{result.error}</p>
-                  )}
-                  <p className="text-body-sm text-on-surface-variant">
-                    Upload panorama 360° manual sebagai alternatif.
-                  </p>
-                </div>
-              )}
+          {showPreview && embedUrl && (
+            <div className="overflow-hidden rounded-lg border border-outline-variant">
+              <iframe
+                src={embedUrl}
+                title="Pratinjau Google Street View lokasi outlet"
+                className="h-72 w-full"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
             </div>
           )}
         </>

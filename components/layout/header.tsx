@@ -14,13 +14,19 @@ interface HeaderProps {
 
 export function Header({ activeNav = "explore" }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // null = status auth belum diketahui — jangan render ikon Login dulu supaya
+  // user yang sedang login tidak melihat "flash" seolah ter-logout.
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setIsLoggedIn(!!user);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
     });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   const navItems = [
@@ -59,10 +65,13 @@ export function Header({ activeNav = "explore" }: HeaderProps) {
 
         {/* Trailing Icons */}
         <div className="flex items-center gap-2 text-amber-500 dark:text-amber-400">
-          {isLoggedIn ? (
+          {isLoggedIn === null ? (
+            /* Placeholder seukuran ikon selama status auth dicek */
+            <span className="inline-flex h-8 w-8" aria-hidden="true" />
+          ) : isLoggedIn ? (
             <>
               <Button asChild variant="ghost" size="icon" className="hidden sm:inline-flex" aria-label="Dashboard">
-                <Link href="/dashboard/user">
+                <Link href="/dashboard">
                   <span className="material-symbols-outlined">dashboard</span>
                 </Link>
               </Button>
@@ -111,17 +120,22 @@ export function Header({ activeNav = "explore" }: HeaderProps) {
               {item.label}
             </Link>
           ))}
-          {isLoggedIn ? (
-            <form action={signOut} className="mt-2">
-              <button type="submit" className="block w-full text-left py-2 px-3 rounded-md font-medium text-sm text-red-600 hover:bg-red-50">
-                Logout
-              </button>
-            </form>
-          ) : (
+          {isLoggedIn === true ? (
+            <>
+              <Link href="/dashboard" className="block py-2 px-3 rounded-md font-medium text-sm text-slate-600 hover:bg-slate-50" onClick={() => setMobileMenuOpen(false)}>
+                Dashboard
+              </Link>
+              <form action={signOut} className="mt-2">
+                <button type="submit" className="block w-full text-left py-2 px-3 rounded-md font-medium text-sm text-red-600 hover:bg-red-50">
+                  Logout
+                </button>
+              </form>
+            </>
+          ) : isLoggedIn === false ? (
             <Link href="/login" className="block py-2 px-3 rounded-md font-medium text-sm text-amber-600" onClick={() => setMobileMenuOpen(false)}>
               Login
             </Link>
-          )}
+          ) : null}
         </div>
       )}
     </header>
