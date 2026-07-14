@@ -42,13 +42,19 @@ export default function AdminReportsPage() {
 
   const filtered = filter === "all" ? reports : reports.filter((r) => r.status === filter);
 
-  async function handleResolve(id: string, status: "resolved" | "rejected") {
+  async function handleResolve(id: string, status: "in_review" | "resolved" | "rejected") {
     setMessage(null);
     const result = await resolveReport(id, status);
     if (!result.success) {
       setMessage(`Gagal memperbarui laporan: ${result.error}`);
     } else {
-      setMessage(status === "resolved" ? "Laporan ditandai selesai." : "Laporan ditolak.");
+      setMessage(
+        status === "resolved"
+          ? "Laporan ditandai selesai."
+          : status === "in_review"
+            ? "Laporan sedang ditinjau."
+            : "Laporan ditolak.",
+      );
     }
     loadReports();
   }
@@ -138,6 +144,11 @@ export default function AdminReportsPage() {
                     <td className="p-4">
                       {report.status === "open" || report.status === "in_review" ? (
                         <div className="flex gap-1">
+                          {report.status === "open" && (
+                            <Button variant="ghost" size="sm" className="text-xs" onClick={() => handleResolve(report.id, "in_review")}>
+                              Tinjau
+                            </Button>
+                          )}
                           <Button variant="ghost" size="sm" className="text-tertiary text-xs" onClick={() => handleResolve(report.id, "resolved")}>
                             Resolve
                           </Button>

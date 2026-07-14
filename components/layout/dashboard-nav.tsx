@@ -143,6 +143,7 @@ export const userNavItems: NavItem[] = [
   { icon: "dashboard", label: "Dashboard", href: "/dashboard/user" },
   { icon: "favorite", label: "Favorites", href: "/dashboard/user/favorites" },
   { icon: "rate_review", label: "Reviews", href: "/dashboard/user/reviews" },
+  { icon: "flag", label: "Laporan Saya", href: "/dashboard/user/reports" },
   { icon: "settings", label: "Preferences", href: "/dashboard/user/settings" },
 ];
 
@@ -151,4 +152,5 @@ export const ownerNavItems: NavItem[] = [
   { icon: "panorama", label: "Panorama 360°", href: "/dashboard/owner/panoramas" },
   { icon: "inventory_2", label: "Products", href: "/dashboard/owner/products" },
   { icon: "rate_review", label: "Reviews", href: "/dashboard/owner/reviews" },
+  { icon: "flag", label: "Laporan", href: "/dashboard/owner/reports" },
 ];
