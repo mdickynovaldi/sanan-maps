@@ -59,7 +59,7 @@ export function ReviewForm({ outletId, onSuccess }: ReviewFormProps) {
       <div className="rounded-xl border border-outline-variant bg-tertiary/5 p-6 text-center">
         <span className="material-symbols-outlined text-4xl text-tertiary mb-2">check_circle</span>
         <h4 className="font-heading text-h3 text-on-surface">Review Terkirim!</h4>
-        <p className="text-body-sm text-on-surface-variant mt-1">Review Anda akan ditampilkan setelah dimoderasi admin.</p>
+        <p className="text-body-sm text-on-surface-variant mt-1">Review Anda sudah tayang. Terima kasih!</p>
         <Button variant="outline" className="mt-4" onClick={() => setSuccess(false)}>
           Tulis Review Lagi
         </Button>
@@ -105,15 +105,15 @@ export function ReviewForm({ outletId, onSuccess }: ReviewFormProps) {
 
       {/* Comment */}
       <div>
-        <label htmlFor="review-comment" className="text-body-sm font-medium text-on-surface block mb-2">Komentar</label>
+        <label htmlFor="review-comment" className="text-body-sm font-medium text-on-surface block mb-2">
+          Komentar <span className="font-normal text-on-surface-variant">(opsional)</span>
+        </label>
         <textarea
           id="review-comment"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           rows={3}
-          required
-          minLength={3}
-          placeholder="Bagikan pengalaman Anda..."
+          placeholder="Bagikan pengalaman Anda... (boleh dikosongkan)"
           className="w-full px-3 py-2 rounded-md border border-outline-variant bg-surface-container-lowest text-body-md outline-none focus:ring-2 focus:ring-primary resize-none"
         />
       </div>

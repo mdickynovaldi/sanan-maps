@@ -4,7 +4,14 @@ export const createReviewSchema = z.object({
   outletId: z.string().uuid("ID outlet tidak valid"),
   rating: z.number().int().min(1).max(5),
   accessibilityRating: z.number().int().min(1).max(5).optional().nullable(),
-  comment: z.string().min(3, "Review minimal 3 karakter"),
+  // Komentar opsional — review boleh bintang saja. Jika diisi, minimal 3 karakter.
+  comment: z
+    .string()
+    .trim()
+    .max(1000, "Komentar maksimal 1000 karakter")
+    .optional()
+    .default("")
+    .refine((v) => v.length === 0 || v.length >= 3, "Komentar minimal 3 karakter, atau kosongkan"),
   tags: z.array(z.string()).optional().default([]),
 });
 

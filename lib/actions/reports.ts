@@ -38,11 +38,16 @@ export async function getReports() {
 
 export async function resolveReport(id: string, status: "resolved" | "rejected"): Promise<ActionResult> {
   const supabase = await createClient();
-  const { error } = await supabase
+  // .select("id") mendeteksi update 0 baris (mis. diblokir RLS) sebagai error.
+  const { data, error } = await supabase
     .from("reports")
     .update({ status } as never)
-    .eq("id", id);
+    .eq("id", id)
+    .select("id");
 
   if (error) return { success: false, error: error.message };
+  if (!data || data.length === 0) {
+    return { success: false, error: "Laporan tidak ditemukan atau Anda tidak berwenang." };
+  }
   return { success: true };
 }

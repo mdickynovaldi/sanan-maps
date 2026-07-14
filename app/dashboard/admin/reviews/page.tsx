@@ -124,7 +124,7 @@ export default function AdminReviewsPage() {
                     {review.status}
                   </span>
                 </div>
-                <p className="text-body-md text-on-surface-variant mb-4">{review.comment}</p>
+                {review.comment && <p className="text-body-md text-on-surface-variant mb-4">{review.comment}</p>}
                 <div className="flex gap-2">
                   {review.status !== "approved" && (
                     <Button variant="ghost" size="sm" className="text-tertiary" onClick={() => handleModerate(review.id, "approved")}>
@@ -136,7 +136,16 @@ export default function AdminReviewsPage() {
                       <span className="material-symbols-outlined text-sm">visibility_off</span> Hide
                     </Button>
                   )}
-                  <Button variant="ghost" size="sm" className="text-on-surface-variant" onClick={() => handleModerate(review.id, "deleted")}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-on-surface-variant"
+                    onClick={() => {
+                      if (confirm(`Hapus review dari ${review.profiles?.name ?? "pengguna"}? Review tidak akan tampil lagi.`)) {
+                        handleModerate(review.id, "deleted");
+                      }
+                    }}
+                  >
                     <span className="material-symbols-outlined text-sm">delete</span> Delete
                   </Button>
                 </div>

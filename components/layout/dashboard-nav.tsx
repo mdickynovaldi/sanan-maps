@@ -28,7 +28,40 @@ export function DashboardNav({ title, subtitle, items, cta }: DashboardNavProps)
   const pathname = usePathname();
 
   return (
-    <nav className="hidden md:flex fixed left-0 top-0 h-full w-[280px] border-r border-slate-200 bg-slate-50 p-4 flex-col gap-2 z-40">
+    <>
+    {/* Bar bawah untuk layar sempit — sidebar desktop tersembunyi di bawah md,
+        jadi navigasi + Logout harus tetap tersedia di mobile. */}
+    <nav
+      aria-label={`Navigasi ${title}`}
+      className="md:hidden fixed bottom-0 inset-x-0 z-40 flex items-center gap-1 border-t border-slate-200 bg-slate-50 px-2 py-1.5"
+    >
+      <div className="flex flex-1 items-center gap-1 overflow-x-auto no-scrollbar">
+        {items.map((item) => {
+          const active = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex shrink-0 flex-col items-center gap-0.5 rounded-lg px-3 py-1.5",
+                active ? "bg-amber-500/10 text-amber-700" : "text-slate-600"
+              )}
+            >
+              <span className="material-symbols-outlined text-[22px]" aria-hidden="true">{item.icon}</span>
+              <span className="text-[10px] leading-tight">{item.label}</span>
+            </Link>
+          );
+        })}
+      </div>
+      <form action={signOut} className="shrink-0">
+        <button type="submit" className="flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-red-600">
+          <span className="material-symbols-outlined text-[22px]" aria-hidden="true">logout</span>
+          <span className="text-[10px] leading-tight">Logout</span>
+        </button>
+      </form>
+    </nav>
+
+    <nav className="hidden md:flex fixed left-0 top-0 h-full w-[280px] border-r border-slate-200 bg-slate-50 p-4 flex-col gap-2 z-40 overflow-y-auto">
       <Link href="/" className="mb-6 flex items-center gap-2.5 px-4 py-2">
         <Logo className="h-9 w-9 shrink-0" />
         <div>
@@ -80,6 +113,7 @@ export function DashboardNav({ title, subtitle, items, cta }: DashboardNavProps)
         </Button>
       </form>
     </nav>
+    </>
   );
 }
 

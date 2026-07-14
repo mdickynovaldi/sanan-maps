@@ -188,7 +188,9 @@ export default function OwnerPanoramasPage() {
                   <span className="material-symbols-outlined text-5xl mb-2 block">panorama</span>
                   <p className="text-body-md">Belum ada panorama 360°</p>
                   <p className="text-body-sm text-on-surface-variant/60 mt-1">
-                    Upload foto panorama untuk memberikan pengalaman virtual tour kepada pengunjung.
+                    Upload foto panorama 360 (equirectangular 2:1) untuk pengalaman virtual tour — bisa diambil
+                    dengan kamera 360 atau mode foto 360 aplikasi Google Street View. Tanpa panorama pun,
+                    halaman outlet otomatis menampilkan Google Street View.
                   </p>
                 </div>
               )}

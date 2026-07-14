@@ -1,22 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { DashboardNav, userNavItems } from "@/components/layout/dashboard-nav";
+import {
+  useAccessibility,
+  type AccessibilityPreferences,
+} from "@/components/providers/accessibility-provider";
 import { createClient } from "@/lib/supabase/client";
 import { getUserFavorites } from "@/lib/actions/favorites";
+import { updateAccessibilityPreferences } from "@/lib/actions/profiles";
 import { DEFAULT_THUMBNAIL } from "@/lib/thumbnails";
-
-type AccessibilityPreferences = {
-  highContrast?: boolean;
-  largeText?: boolean;
-  reducedMotion?: boolean;
-  defaultListView?: boolean;
-  audioGuide?: boolean;
-  textDirections?: boolean;
-};
 
 type ProfileData = {
   name: string;
@@ -24,7 +20,7 @@ type ProfileData = {
   role: string;
   avatar_url: string | null;
   created_at: string;
-  accessibility_preferences: AccessibilityPreferences | null;
+  accessibility_preferences: Partial<AccessibilityPreferences> | null;
 };
 
 type FavoriteOutlet = {
@@ -38,16 +34,17 @@ type FavoriteRow = {
   outlets: FavoriteOutlet | null;
 };
 
-const PREFERENCE_LABELS: Record<string, { label: string; desc: string }> = {
-  highContrast: { label: "High Contrast", desc: "Enhance visual readability" },
-  largeText: { label: "Large Text", desc: "Increase font sizes" },
-  reducedMotion: { label: "Reduced Motion", desc: "Minimize animations" },
-  defaultListView: { label: "Default List View", desc: "Prefer list over map" },
-  audioGuide: { label: "Audio Guide", desc: "Enable audio descriptions" },
-  textDirections: { label: "Text Directions", desc: "Step-by-step text routes" },
-};
+const PREFERENCE_LABELS: Array<{ key: keyof AccessibilityPreferences; label: string; desc: string }> = [
+  { key: "highContrast", label: "High Contrast", desc: "Enhance visual readability" },
+  { key: "largeText", label: "Large Text", desc: "Increase font sizes" },
+  { key: "reducedMotion", label: "Reduced Motion", desc: "Minimize animations" },
+  { key: "defaultListView", label: "Default List View", desc: "Prefer list over map" },
+  { key: "audioGuide", label: "Audio Guide", desc: "Enable audio descriptions" },
+  { key: "textDirections", label: "Text Directions", desc: "Step-by-step text routes" },
+];
 
 export default function UserDashboardPage() {
+  const { prefs, set } = useAccessibility();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [favCount, setFavCount] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
@@ -55,6 +52,31 @@ export default function UserDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [favError, setFavError] = useState<string | null>(null);
+  const [prefError, setPrefError] = useState<string | null>(null);
+
+  // Sama seperti halaman settings: nilai terkini di luar siklus render +
+  // penanda interaksi agar hidrasi dari DB tidak menimpa klik user.
+  const prefsRef = useRef(prefs);
+  useEffect(() => {
+    prefsRef.current = prefs;
+  }, [prefs]);
+  const interactedRef = useRef(false);
+
+  async function handleTogglePref(key: keyof AccessibilityPreferences) {
+    interactedRef.current = true;
+    const previous = prefsRef.current[key];
+    const next = { ...prefsRef.current, [key]: !previous };
+    prefsRef.current = next;
+    set(key, !previous);
+    setPrefError(null);
+
+    const result = await updateAccessibilityPreferences(next);
+    if (!result.success) {
+      prefsRef.current = { ...prefsRef.current, [key]: previous };
+      set(key, previous);
+      setPrefError(result.error ?? "Gagal menyimpan preferensi. Silakan coba lagi.");
+    }
+  }
 
   useEffect(() => {
     async function load() {
@@ -80,6 +102,21 @@ export default function UserDashboardPage() {
           return;
         }
         setProfile(profileData as unknown as ProfileData);
+
+        // Terapkan preferensi tersimpan ke provider agar toggle Quick
+        // Preferences mencerminkan profil — lewati jika user sudah mengklik.
+        if (!interactedRef.current) {
+          const dbPrefs =
+            (profileData as unknown as ProfileData).accessibility_preferences ?? {};
+          const osReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          (Object.entries(dbPrefs) as Array<[keyof AccessibilityPreferences, unknown]>).forEach(
+            ([key, value]) => {
+              if (typeof value !== "boolean") return;
+              if (key === "reducedMotion" && value === false && osReducedMotion) return;
+              set(key, value);
+            },
+          );
+        }
 
         const { count: fc } = await supabase
           .from("favorites")
@@ -111,18 +148,13 @@ export default function UserDashboardPage() {
       }
     }
     load();
-  }, []);
+  }, [set]);
 
   const displayName = profile?.name ?? "";
   const joinDate = profile?.created_at
     ? new Date(profile.created_at).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
     : "";
   const initial = displayName.trim().charAt(0).toUpperCase() || "?";
-
-  const prefEntries = Object.entries(profile?.accessibility_preferences ?? {}).filter(
-    (entry): entry is [string, boolean] =>
-      typeof entry[1] === "boolean" && entry[0] in PREFERENCE_LABELS,
-  );
 
   return (
     <div className="min-h-screen flex bg-background text-on-background">
@@ -220,32 +252,33 @@ export default function UserDashboardPage() {
                   <h3 className="font-heading text-h3 text-on-surface">Quick Preferences</h3>
                   <Link href="/dashboard/user/settings" className="text-body-sm text-primary hover:underline">Edit</Link>
                 </div>
-                {prefEntries.length > 0 ? (
-                  <div className="space-y-4">
-                    {prefEntries.map(([key, enabled]) => {
-                      const meta = PREFERENCE_LABELS[key];
-                      if (!meta) return null;
-                      return (
-                        <div key={key} className="flex items-center justify-between rounded-lg border border-outline-variant/50 bg-surface p-3">
-                          <div>
-                            <p className="text-body-md font-semibold text-on-surface">{meta.label}</p>
-                            <p className="text-body-sm text-on-surface-variant">{meta.desc}</p>
-                          </div>
-                          <div
-                            role="img"
-                            aria-label={`${meta.label}: ${enabled ? "aktif" : "nonaktif"}`}
-                            className={`h-6 w-11 rounded-full ${enabled ? "bg-primary-container" : "bg-surface-variant"}`}
-                          />
-                        </div>
-                      );
-                    })}
+                {prefError && (
+                  <div className="mb-3 rounded-lg bg-error-container p-3 text-body-sm text-on-error-container" role="alert">
+                    {prefError}
                   </div>
-                ) : (
-                  <p className="text-body-sm text-on-surface-variant">
-                    Belum ada preferensi aksesibilitas.{" "}
-                    <Link href="/dashboard/user/settings" className="text-primary hover:underline">Atur preferensi</Link>
-                  </p>
                 )}
+                <div className="space-y-4">
+                  {PREFERENCE_LABELS.map(({ key, label, desc }) => {
+                    const enabled = Boolean(prefs[key]);
+                    return (
+                      <div key={key} className="flex items-center justify-between rounded-lg border border-outline-variant/50 bg-surface p-3">
+                        <div>
+                          <p className="text-body-md font-semibold text-on-surface">{label}</p>
+                          <p className="text-body-sm text-on-surface-variant">{desc}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleTogglePref(key)}
+                          className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${enabled ? "bg-primary-container" : "bg-surface-variant"}`}
+                          aria-pressed={enabled}
+                          aria-label={`Toggle ${label}`}
+                        >
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${enabled ? "translate-x-6" : "translate-x-1"}`} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
               </section>
             </div>
           </>

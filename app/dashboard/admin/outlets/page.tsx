@@ -173,15 +173,22 @@ export default function AdminOutletsPage() {
                     </td>
                     <td className="p-4">
                       <div className="flex gap-2">
-                        <Link href={`/outlets/${outlet.slug}`}>
-                          <Button variant="ghost" size="sm" className="text-xs">View</Button>
-                        </Link>
+                        <Button asChild variant="ghost" size="sm" className="text-xs">
+                          <Link href={`/outlets/${outlet.slug}`}>View</Link>
+                        </Button>
                         {outlet.status === "pending" && (
                           <>
                             <Button variant="ghost" size="sm" className="text-xs text-tertiary" onClick={() => handleApprove(outlet.id)}>
                               Approve
                             </Button>
-                            <Button variant="ghost" size="sm" className="text-xs text-error" onClick={() => handleReject(outlet.id)}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-xs text-error"
+                              onClick={() => {
+                                if (confirm(`Tolak outlet "${outlet.name}"? Outlet tidak akan tampil publik.`)) handleReject(outlet.id);
+                              }}
+                            >
                               Reject
                             </Button>
                           </>

@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { createReviewSchema, type CreateReviewInput } from "@/lib/validations/review";
+import { createReviewSchema, moderateReviewSchema, type CreateReviewInput } from "@/lib/validations/review";
 import type { ActionResult } from "./auth";
 
 export async function getOutletReviews(outletId: string) {
@@ -27,6 +27,8 @@ export async function createReview(input: CreateReviewInput): Promise<ActionResu
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { success: false, error: "Login diperlukan untuk menulis review" };
 
+  // Review langsung tayang (post-moderation): admin memantau lewat dashboard
+  // dan menyembunyikan/menghapus review yang tidak pantas setelahnya.
   const { error } = await supabase.from("reviews").insert({
     outlet_id: parsed.data.outletId,
     user_id: user.id,
@@ -34,7 +36,7 @@ export async function createReview(input: CreateReviewInput): Promise<ActionResu
     accessibility_rating: parsed.data.accessibilityRating ?? null,
     comment: parsed.data.comment,
     tags: parsed.data.tags,
-    status: "pending",
+    status: "approved",
   } as never);
 
   if (error) return { success: false, error: error.message };
@@ -72,12 +74,23 @@ export async function deleteReview(id: string): Promise<ActionResult> {
 }
 
 export async function moderateReview(id: string, status: string): Promise<ActionResult> {
+  const parsed = moderateReviewSchema.safeParse({ id, status });
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message };
+  }
+
   const supabase = await createClient();
-  const { error } = await supabase
+  // .select("id") mendeteksi update 0 baris (mis. diblokir RLS) sebagai error,
+  // bukan "sukses" palsu yang membuat tombol terlihat tidak bekerja.
+  const { data, error } = await supabase
     .from("reviews")
-    .update({ status } as never)
-    .eq("id", id);
+    .update({ status: parsed.data.status } as never)
+    .eq("id", parsed.data.id)
+    .select("id");
 
   if (error) return { success: false, error: error.message };
+  if (!data || data.length === 0) {
+    return { success: false, error: "Review tidak ditemukan atau Anda tidak berwenang." };
+  }
   return { success: true };
 }

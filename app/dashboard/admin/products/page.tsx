@@ -4,11 +4,15 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DashboardNav, adminNavItems } from "@/components/layout/dashboard-nav";
+import { ProductForm } from "@/components/features/product-form";
+import { deleteProduct } from "@/lib/actions/products";
 import { createClient } from "@/lib/supabase/client";
 
 type ProductRow = {
   id: string;
+  outlet_id: string;
   name: string;
+  description: string;
   price: number;
   category: string | null;
   image_url: string | null;
@@ -22,6 +26,22 @@ export default function AdminProductsPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingProduct, setEditingProduct] = useState<ProductRow | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  async function handleDelete(product: ProductRow) {
+    if (!confirm(`Hapus produk "${product.name}" dari ${product.outlets?.name ?? "outlet"}? Tindakan ini tidak bisa dibatalkan.`)) return;
+    setDeletingId(product.id);
+    setError(null);
+    const result = await deleteProduct(product.id);
+    if (result.success) {
+      setProducts((prev) => prev.filter((p) => p.id !== product.id));
+      if (editingProduct?.id === product.id) setEditingProduct(null);
+    } else {
+      setError(result.error ?? "Gagal menghapus produk.");
+    }
+    setDeletingId(null);
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -79,6 +99,29 @@ export default function AdminProductsPage() {
           </div>
         )}
 
+        {editingProduct && (
+          <div className="mb-6 rounded-xl border border-outline-variant bg-surface p-6">
+            <h3 className="font-heading text-h3 text-on-surface mb-4">Edit: {editingProduct.name}</h3>
+            <ProductForm
+              key={editingProduct.id}
+              outletId={editingProduct.outlet_id}
+              mode="edit"
+              initialData={{
+                id: editingProduct.id,
+                name: editingProduct.name,
+                description: editingProduct.description,
+                price: editingProduct.price,
+                category: editingProduct.category ?? undefined,
+                imageUrl: editingProduct.image_url ?? undefined,
+                imageAlt: editingProduct.image_alt ?? undefined,
+                isAvailable: editingProduct.is_available,
+              }}
+              onSuccess={() => { setEditingProduct(null); load(); }}
+              onCancel={() => setEditingProduct(null)}
+            />
+          </div>
+        )}
+
         {loading ? (
           <div className="rounded-xl border border-outline-variant bg-surface p-12 text-center text-on-surface-variant" role="status">
             Memuat produk...
@@ -124,9 +167,29 @@ export default function AdminProductsPage() {
                         </span>
                       </td>
                       <td className="p-4">
-                        <Button variant="ghost" size="icon" aria-label={`Edit ${product.name}`}>
-                          <span className="material-symbols-outlined text-xl" aria-hidden="true">edit</span>
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label={`Edit ${product.name}`}
+                            onClick={() => {
+                              setEditingProduct(product);
+                              window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
+                          >
+                            <span className="material-symbols-outlined text-xl" aria-hidden="true">edit</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label={`Hapus ${product.name}`}
+                            disabled={deletingId === product.id}
+                            onClick={() => handleDelete(product)}
+                            className="text-error hover:bg-error-container/40"
+                          >
+                            <span className="material-symbols-outlined text-xl" aria-hidden="true">delete</span>
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}

@@ -400,7 +400,7 @@ export default function OutletDetailPage() {
                         ))}
                       </div>
                     </div>
-                    <p className="text-body-md text-on-surface-variant mb-2">{review.comment}</p>
+                    {review.comment && <p className="text-body-md text-on-surface-variant mb-2">{review.comment}</p>}
                     {review.tags && review.tags.length > 0 && (
                       <div className="flex gap-2 mb-3">
                         {review.tags.map((tag) => (

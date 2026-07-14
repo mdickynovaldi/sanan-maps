@@ -114,7 +114,7 @@ export default function OwnerReviewsPage() {
         ) : (
           <div className="space-y-4">
             {reviews.map((review) => {
-              const status = STATUS_LABELS[review.status] ?? STATUS_LABELS.pending;
+              const status = STATUS_LABELS[review.status] ?? STATUS_LABELS.approved;
               return (
                 <div key={review.id} className="rounded-xl border border-outline-variant bg-surface p-6">
                   <div className="flex items-start justify-between mb-3">
@@ -136,7 +136,7 @@ export default function OwnerReviewsPage() {
                     </div>
                   </div>
 
-                  <p className="text-body-md text-on-surface-variant mb-3">{review.comment}</p>
+                  {review.comment && <p className="text-body-md text-on-surface-variant mb-3">{review.comment}</p>}
 
                   {review.tags && review.tags.length > 0 && (
                     <div className="flex gap-2 mb-3">

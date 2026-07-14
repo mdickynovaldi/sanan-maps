@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DashboardNav, adminNavItems } from "@/components/layout/dashboard-nav";
+import { signOut } from "@/lib/actions/auth";
 import { createClient } from "@/lib/supabase/client";
 
 type RecentOutletRow = {
@@ -64,10 +65,12 @@ export default function AdminDashboardPage() {
           .select("id, name, slug, status, outlet_categories(categories(name))")
           .order("created_at", { ascending: false })
           .limit(6),
+        // Review langsung tayang — panel ini memantau review TERBARU agar
+        // admin bisa menyembunyikan/menghapus yang tidak pantas.
         supabase
           .from("reviews")
           .select("*, outlets(name), profiles(name)")
-          .eq("status", "pending")
+          .neq("status", "deleted")
           .order("created_at", { ascending: false })
           .limit(5),
       ]);
@@ -140,13 +143,12 @@ export default function AdminDashboardPage() {
               <span className="rounded-full border border-primary-container/30 bg-primary-container/20 px-3 py-1 text-label-caps text-on-primary-container">Live Data</span>
             )}
           </div>
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" aria-hidden="true">search</span>
-              <input placeholder="Search outlets, users..." aria-label="Cari outlet atau pengguna" className="pl-10 pr-4 py-2 bg-surface-container rounded-lg border-none text-body-sm w-64 shadow-sm focus:ring-2 focus:ring-primary" />
-            </div>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-container text-on-primary-container font-bold text-sm">A</div>
-          </div>
+          <form action={signOut}>
+            <Button type="submit" variant="ghost" className="text-red-600 hover:bg-red-50">
+              <span className="material-symbols-outlined" aria-hidden="true">logout</span>
+              Logout
+            </Button>
+          </form>
         </header>
 
         {loading ? (
@@ -245,7 +247,7 @@ export default function AdminDashboardPage() {
                   <div className="p-6 border-b border-outline-variant bg-surface-container-lowest flex justify-between items-center">
                     <div>
                       <h3 className="font-heading text-h3 text-on-surface">Recent Reviews</h3>
-                      <p className="text-body-sm text-on-surface-variant">Menunggu moderasi</p>
+                      <p className="text-body-sm text-on-surface-variant">Review terbaru — pantau &amp; moderasi</p>
                     </div>
                     <Button asChild variant="ghost" size="sm" className="text-primary">
                       <Link href="/dashboard/admin/reviews">Moderasi</Link>
@@ -286,7 +288,7 @@ export default function AdminDashboardPage() {
                     })}
                     {pendingReviews.length === 0 && (
                       <div className="p-8 text-center text-on-surface-variant text-body-sm">
-                        Tidak ada review yang menunggu moderasi.
+                        Belum ada review masuk.
                       </div>
                     )}
                   </div>
