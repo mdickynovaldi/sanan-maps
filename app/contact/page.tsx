@@ -129,7 +129,7 @@ export default function ContactPage() {
           </div>
 
           {/* FAQ Section */}
-          <section className="rounded-2xl border border-outline-variant bg-surface-container-low p-8">
+          <section className="rounded-2xl border border-outline-variant bg-surface-container-low p-5 sm:p-8">
             <h2 className="font-heading text-h2 text-on-background mb-6">Pertanyaan Umum</h2>
             <div className="space-y-4">
               {[

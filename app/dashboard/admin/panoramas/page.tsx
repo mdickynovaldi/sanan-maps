@@ -96,8 +96,8 @@ export default function AdminPanoramasPage() {
         items={adminNavItems}
       />
 
-      <main className="flex-1 md:ml-[280px] p-6 max-w-[1280px] mx-auto w-full">
-        <header className="mb-8 flex items-center justify-between">
+      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
+        <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-center justify-between">
           <div>
             <h2 className="font-heading text-h2 text-on-surface">Kelola Panorama 360°</h2>
             <p className="text-body-sm text-on-surface-variant">

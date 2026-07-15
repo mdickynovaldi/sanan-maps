@@ -70,7 +70,7 @@ export default function AdminReportsPage() {
     <div className="min-h-screen flex bg-background text-on-background">
       <DashboardNav title="Mitra Sanan" subtitle="Management Portal" items={adminNavItems} />
 
-      <main className="flex-1 md:ml-[280px] p-6 max-w-[1280px] mx-auto w-full">
+      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
         <header className="mb-8">
           <h2 className="font-heading text-h2 text-on-surface">Laporan Data Salah</h2>
           <p className="text-body-sm text-on-surface-variant">Kelola laporan dari pengguna tentang data yang tidak akurat</p>
@@ -88,7 +88,7 @@ export default function AdminReportsPage() {
           </div>
         )}
 
-        <div className="mb-6 flex gap-2">
+        <div className="mb-6 flex flex-wrap gap-2">
           {["all", "open", "in_review", "resolved", "rejected"].map((s) => (
             <Button
               key={s}
@@ -105,7 +105,7 @@ export default function AdminReportsPage() {
         {loading ? (
           <div className="text-center py-12 text-on-surface-variant" role="status">Loading...</div>
         ) : (
-          <div className="rounded-xl border border-outline-variant bg-surface overflow-hidden">
+          <div className="rounded-xl border border-outline-variant bg-surface overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-surface-container-low text-on-surface-variant text-label-caps uppercase border-b border-outline-variant">

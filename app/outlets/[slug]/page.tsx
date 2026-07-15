@@ -206,7 +206,7 @@ export default function OutletDetailPage() {
         <div className="mx-auto w-full max-w-[1280px] px-6 py-8">
           <section className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-12">
             <div className="lg:col-span-7">
-              <div className="grid h-[400px] grid-cols-2 grid-rows-2 gap-2 overflow-hidden rounded-xl">
+              <div className="grid h-[220px] grid-cols-2 grid-rows-1 gap-2 overflow-hidden rounded-xl md:h-[400px] md:grid-rows-2">
                 <div className="relative col-span-2 row-span-1 md:col-span-1 md:row-span-2 group bg-surface-container-high">
                   <HeroPhoto src={products[0]?.image_url ?? null} alt={products[0]?.image_alt || `Foto utama ${outlet.name}`} fallbackSrc={getCategoryThumbnail(categorySlug)} priority />
                 </div>
@@ -327,7 +327,7 @@ export default function OutletDetailPage() {
           </section>
 
           <section className="mb-8">
-            <div className="flex border-b border-outline-variant mb-6">
+            <div className="flex overflow-x-auto no-scrollbar border-b border-outline-variant mb-6">
               {[
                 { key: "products", label: `Produk / Menu (${products.length})`, icon: "inventory_2" },
                 { key: "reviews", label: `Ulasan (${reviews.length})`, icon: "rate_review" },
@@ -336,7 +336,7 @@ export default function OutletDetailPage() {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key as typeof activeTab)}
-                  className={`flex items-center gap-2 px-4 py-3 text-body-md font-medium border-b-2 transition-colors ${
+                  className={`flex shrink-0 items-center gap-2 whitespace-nowrap px-4 py-3 text-body-md font-medium border-b-2 transition-colors ${
                     activeTab === tab.key
                       ? "border-primary text-primary"
                       : "border-transparent text-on-surface-variant hover:text-on-surface"
@@ -452,7 +452,7 @@ export default function OutletDetailPage() {
 
           <section className="mb-8">
             <div className="rounded-xl border border-outline-variant bg-surface p-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h3 className="font-heading text-h3 text-on-surface">Ada data yang salah?</h3>
                   <p className="text-body-sm text-on-surface-variant">Bantu kami memperbaiki informasi outlet ini</p>

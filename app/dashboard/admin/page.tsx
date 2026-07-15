@@ -136,7 +136,7 @@ export default function AdminDashboardPage() {
       <DashboardNav title="Mitra Sanan" subtitle="Management Portal" items={adminNavItems} />
 
       <main className="flex-1 md:ml-[280px] flex flex-col h-full overflow-y-auto bg-surface-container-lowest">
-        <header className="sticky top-0 z-40 flex justify-between items-center bg-surface/95 backdrop-blur-md border-b border-outline-variant px-8 py-4 shadow-[var(--shadow-level-1)]">
+        <header className="sticky top-0 z-40 flex flex-wrap justify-between items-center gap-2 bg-surface/95 backdrop-blur-md border-b border-outline-variant px-4 py-3 md:px-8 md:py-4 shadow-[var(--shadow-level-1)]">
           <div className="flex items-center gap-4">
             <h2 className="font-heading text-h2 text-on-surface">System Overview</h2>
             {!loading && !error && (
@@ -164,7 +164,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         ) : (
-          <div className="p-8 mx-auto w-full max-w-[1280px] flex flex-col gap-8">
+          <div className="p-4 pb-24 md:p-8 md:pb-8 mx-auto w-full max-w-[1280px] flex flex-col gap-6 md:gap-8">
             {/* Key Metrics */}
             <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {metricCards.map((card) => (

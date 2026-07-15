@@ -160,7 +160,7 @@ export default function UserDashboardPage() {
     <div className="min-h-screen flex bg-background text-on-background">
       <DashboardNav title="Sanan Explorer" subtitle="User Dashboard" items={userNavItems} />
 
-      <main className="flex-1 md:ml-[280px] p-6 max-w-[1280px] mx-auto w-full">
+      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
         {loading ? (
           <div className="text-center py-16 text-on-surface-variant" role="status">
             Memuat dashboard...

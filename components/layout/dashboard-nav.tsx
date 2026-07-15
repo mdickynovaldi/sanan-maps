@@ -33,7 +33,7 @@ export function DashboardNav({ title, subtitle, items, cta }: DashboardNavProps)
         jadi navigasi + Logout harus tetap tersedia di mobile. */}
     <nav
       aria-label={`Navigasi ${title}`}
-      className="md:hidden fixed bottom-0 inset-x-0 z-40 flex items-center gap-1 border-t border-slate-200 bg-slate-50 px-2 py-1.5"
+      className="md:hidden fixed bottom-0 inset-x-0 z-40 flex items-center gap-1 border-t border-slate-200 bg-slate-50 px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]"
     >
       <div className="flex flex-1 items-center gap-1 overflow-x-auto no-scrollbar">
         {items.map((item) => {

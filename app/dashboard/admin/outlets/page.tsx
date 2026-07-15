@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DashboardNav, adminNavItems } from "@/components/layout/dashboard-nav";
 import { OutletForm } from "@/components/features/outlet-form";
-import { getAllOutlets, approveOutlet, rejectOutlet } from "@/lib/actions/outlets";
+import { getAllOutlets, approveOutlet, rejectOutlet, deleteOutlet } from "@/lib/actions/outlets";
 
 type OutletRow = {
   id: string;
@@ -65,11 +65,38 @@ export default function AdminOutletsPage() {
     loadOutlets();
   }
 
+  async function handleDelete(outlet: OutletRow) {
+    setMessage(null);
+    // Konfirmasi ganda: dialog peringatan + ketik nama outlet. Penghapusan
+    // bersifat permanen dan ikut menghapus semua data terkait (cascade).
+    if (
+      !confirm(
+        `HAPUS PERMANEN outlet "${outlet.name}"?\n\nSemua produk, review, foto, panorama 360, laporan, dan favorit yang terkait ikut terhapus dan TIDAK BISA dibatalkan.\n\nUntuk pelanggaran biasa, gunakan Reject (outlet disembunyikan tapi datanya tersimpan).`,
+      )
+    ) {
+      return;
+    }
+    const typed = prompt(`Ketik nama outlet persis untuk mengonfirmasi penghapusan:\n${outlet.name}`);
+    if (typed === null) return;
+    if (typed.trim() !== outlet.name) {
+      setMessage("Nama outlet tidak cocok — penghapusan dibatalkan.");
+      return;
+    }
+
+    const result = await deleteOutlet(outlet.id);
+    setMessage(
+      result.success
+        ? `Outlet "${outlet.name}" beserta seluruh data terkaitnya telah dihapus permanen.`
+        : `Gagal menghapus: ${result.error}`,
+    );
+    loadOutlets();
+  }
+
   return (
     <div className="min-h-screen flex bg-background text-on-background">
       <DashboardNav title="Mitra Sanan" subtitle="Management Portal" items={adminNavItems} />
 
-      <main className="flex-1 md:ml-[280px] p-6 max-w-[1280px] mx-auto w-full">
+      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
         <header className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <h2 className="font-heading text-h2 text-on-surface">Outlet Management</h2>
@@ -144,7 +171,7 @@ export default function AdminOutletsPage() {
         {loading ? (
           <div className="text-center py-12 text-on-surface-variant">Loading...</div>
         ) : (
-          <div className="rounded-xl border border-outline-variant bg-surface overflow-hidden">
+          <div className="rounded-xl border border-outline-variant bg-surface overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-surface-container-low text-on-surface-variant text-label-caps uppercase border-b border-outline-variant">
@@ -172,7 +199,7 @@ export default function AdminOutletsPage() {
                       </span>
                     </td>
                     <td className="p-4">
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <Button asChild variant="ghost" size="sm" className="text-xs">
                           <Link href={`/outlets/${outlet.slug}`}>View</Link>
                         </Button>
@@ -195,6 +222,15 @@ export default function AdminOutletsPage() {
                         )}
                         <Button variant="ghost" size="sm" className="text-xs" onClick={() => { setEditingOutlet(outlet); setShowForm(true); }}>
                           Edit
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs text-error hover:bg-error-container/40"
+                          aria-label={`Hapus permanen ${outlet.name}`}
+                          onClick={() => handleDelete(outlet)}
+                        >
+                          Hapus
                         </Button>
                       </div>
                     </td>

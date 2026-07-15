@@ -69,8 +69,8 @@ export function OpeningHoursField({
       </p>
       <div className="space-y-2">
         {rows.map((row, i) => (
-          <div key={i} className="flex items-start gap-2">
-            <div className="flex-1">
+          <div key={i} className="flex flex-wrap items-start gap-2">
+            <div className="min-w-[9rem] flex-1">
               <label htmlFor={`${idPrefix}-days-${i}`} className="sr-only">
                 Hari baris {i + 1}
               </label>
@@ -82,7 +82,7 @@ export function OpeningHoursField({
                 className={inputClassName}
               />
             </div>
-            <div className="flex-1">
+            <div className="min-w-[9rem] flex-1">
               <label htmlFor={`${idPrefix}-hours-${i}`} className="sr-only">
                 Jam buka baris {i + 1}
               </label>

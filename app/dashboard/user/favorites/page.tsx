@@ -126,7 +126,7 @@ export default function UserFavoritesPage() {
     <div className="min-h-screen flex bg-background text-on-background">
       <DashboardNav title="Sanan Explorer" subtitle="User Dashboard" items={userNavItems} />
 
-      <main className="flex-1 md:ml-[280px] p-6 max-w-[1280px] mx-auto w-full">
+      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
         <header className="mb-8">
           <h2 className="font-heading text-h2 text-on-surface">Favorite Outlets</h2>
           <p className="text-body-sm text-on-surface-variant">Outlet yang Anda simpan untuk dikunjungi nanti</p>

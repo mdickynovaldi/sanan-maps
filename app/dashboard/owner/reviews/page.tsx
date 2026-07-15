@@ -86,7 +86,7 @@ export default function OwnerReviewsPage() {
         cta={{ label: "Add New Product", href: "/dashboard/owner/products", icon: "add" }}
       />
 
-      <main className="flex-1 md:ml-[280px] p-6 max-w-[1280px] mx-auto w-full">
+      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
         <header className="mb-8">
           <h2 className="font-heading text-h2 text-on-surface">Outlet Reviews</h2>
           <p className="text-body-sm text-on-surface-variant">
@@ -139,7 +139,7 @@ export default function OwnerReviewsPage() {
                   {review.comment && <p className="text-body-md text-on-surface-variant mb-3">{review.comment}</p>}
 
                   {review.tags && review.tags.length > 0 && (
-                    <div className="flex gap-2 mb-3">
+                    <div className="flex flex-wrap gap-2 mb-3">
                       {review.tags.map((tag) => (
                         <span key={tag} className="rounded-full bg-surface-container-high px-2 py-0.5 text-[11px] text-on-surface-variant capitalize">{tag}</span>
                       ))}

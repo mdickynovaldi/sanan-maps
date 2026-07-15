@@ -74,7 +74,7 @@ export default function AdminProductsPage() {
     <div className="min-h-screen flex bg-background text-on-background">
       <DashboardNav title="Mitra Sanan" subtitle="Management Portal" items={adminNavItems} />
 
-      <main className="flex-1 md:ml-[280px] p-6 max-w-[1280px] mx-auto w-full">
+      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
         <header className="mb-8 flex items-center justify-between">
           <div>
             <h2 className="font-heading text-h2 text-on-surface">Produk / Menu</h2>

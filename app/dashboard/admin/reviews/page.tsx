@@ -60,7 +60,7 @@ export default function AdminReviewsPage() {
     <div className="min-h-screen flex bg-background text-on-background">
       <DashboardNav title="Mitra Sanan" subtitle="Management Portal" items={adminNavItems} />
 
-      <main className="flex-1 md:ml-[280px] p-6 max-w-[1280px] mx-auto w-full">
+      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
         <header className="mb-8">
           <h2 className="font-heading text-h2 text-on-surface">Moderasi Review</h2>
           <p className="text-body-sm text-on-surface-variant">Kelola dan moderasi review pengguna</p>
@@ -72,7 +72,7 @@ export default function AdminReviewsPage() {
           </div>
         )}
 
-        <div className="mb-6 flex gap-2">
+        <div className="mb-6 flex flex-wrap gap-2">
           {["all", "approved", "pending", "hidden"].map((s) => (
             <Button
               key={s}

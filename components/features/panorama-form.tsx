@@ -135,7 +135,7 @@ export function PanoramaForm({ outletId, onSuccess, onCancel }: PanoramaFormProp
               )}
             </div>
           ) : (
-            <div className="h-48 flex flex-col items-center justify-center gap-2 text-on-surface-variant">
+            <div className="min-h-48 flex flex-col items-center justify-center gap-2 p-4 text-on-surface-variant">
               <span className="material-symbols-outlined text-4xl">panorama</span>
               <p className="text-body-sm">Klik untuk upload gambar 360°</p>
               <p className="text-body-sm text-on-surface-variant/60">JPG, PNG, WebP • Maks 5MB • Foto panorama 360 equirectangular (rasio 2:1)</p>

@@ -292,9 +292,11 @@ export default function MapPage() {
   return (
     <>
       <Header activeNav="explore" />
-      <main className="flex h-[calc(100vh-4.5rem)] flex-row">
-        <aside className="hidden w-[380px] flex-shrink-0 flex-col overflow-hidden border-r border-outline-variant bg-surface md:flex">
-          <div className="flex flex-col gap-4 border-b border-outline-variant bg-surface-container-low p-6">
+      {/* Mobile: direktori jadi panel 40% di atas peta; md+: sidebar kiri 380px.
+          100dvh (bukan 100vh) agar tidak tertutup toolbar browser mobile. */}
+      <main className="flex h-[calc(100dvh-4.5rem)] flex-col md:flex-row">
+        <aside className="flex h-[40%] w-full flex-shrink-0 flex-col overflow-hidden border-b border-outline-variant bg-surface md:h-full md:w-[380px] md:border-b-0 md:border-r">
+          <div className="flex flex-col gap-3 border-b border-outline-variant bg-surface-container-low p-4 md:gap-4 md:p-6">
             <div className="flex items-center justify-between">
               <h2 className="font-heading text-h3 text-on-surface">Direktori UMKM</h2>
               <span className="material-symbols-outlined text-on-surface-variant" aria-hidden="true">tune</span>
@@ -312,7 +314,7 @@ export default function MapPage() {
             </p>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6">
             <div className="flex flex-col gap-4">
               {filteredOutlets.length === 0 && (
                 <p className="text-body-sm text-on-surface-variant text-center py-8">Tidak ada outlet ditemukan.</p>
@@ -504,7 +506,7 @@ export default function MapPage() {
           {/* Status / error pencarian rute */}
           <div aria-live="polite" className="absolute inset-x-0 bottom-6 z-10 flex flex-col items-center gap-2 px-6 pointer-events-none">
             {statusMessage && (
-              <div className="pointer-events-auto flex items-center gap-3 rounded-xl border border-outline-variant bg-surface px-4 py-3 shadow-lg">
+              <div className="pointer-events-auto flex max-w-full flex-wrap items-center gap-3 rounded-xl border border-outline-variant bg-surface px-4 py-3 shadow-lg">
                 <span className="material-symbols-outlined text-error" aria-hidden="true">error</span>
                 <p className="text-body-sm text-on-surface">{statusMessage}</p>
                 {routeErrorMaps && (
@@ -512,7 +514,7 @@ export default function MapPage() {
                     href={routeErrorMaps}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="whitespace-nowrap text-body-sm font-medium text-primary hover:underline"
+                    className="text-body-sm font-medium text-primary hover:underline"
                   >
                     Buka di Google Maps
                   </a>

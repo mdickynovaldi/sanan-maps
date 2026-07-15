@@ -97,7 +97,7 @@ export default function AdminAnalyticsPage() {
     <div className="min-h-screen flex bg-background text-on-background">
       <DashboardNav title="Mitra Sanan" subtitle="Management Portal" items={adminNavItems} />
 
-      <main className="flex-1 md:ml-[280px] p-6 max-w-[1280px] mx-auto w-full">
+      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
         <header className="mb-8">
           <h2 className="font-heading text-h2 text-on-surface">Analytics</h2>
           <p className="text-body-sm text-on-surface-variant">Statistik penggunaan platform</p>

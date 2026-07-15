@@ -65,7 +65,7 @@ export default function AdminUsersPage() {
     <div className="min-h-screen flex bg-background text-on-background">
       <DashboardNav title="Mitra Sanan" subtitle="Management Portal" items={adminNavItems} />
 
-      <main className="flex-1 md:ml-[280px] p-6 max-w-[1280px] mx-auto w-full">
+      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
         <header className="mb-8">
           <h2 className="font-heading text-h2 text-on-surface">Manajemen User</h2>
           <p className="text-body-sm text-on-surface-variant">Kelola pengguna dan role akses</p>
@@ -126,7 +126,7 @@ export default function AdminUsersPage() {
                         value={user.role}
                         disabled={savingId === user.id}
                         onChange={(e) => handleRoleChange(user, e.target.value as Role)}
-                        className="h-9 rounded-md border border-outline-variant bg-surface-container-lowest px-2 text-body-sm text-on-surface outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+                        className="h-9 rounded-md border border-outline-variant bg-surface-container-lowest px-2 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
                       >
                         <option value="user">user</option>
                         <option value="owner">owner</option>

@@ -67,7 +67,7 @@ export default function UserReviewsPage() {
     <div className="min-h-screen flex bg-background text-on-background">
       <DashboardNav title="Sanan Explorer" subtitle="User Dashboard" items={userNavItems} />
 
-      <main className="flex-1 md:ml-[280px] p-6 max-w-[1280px] mx-auto w-full">
+      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
         <header className="mb-8">
           <h2 className="font-heading text-h2 text-on-surface">Review Saya</h2>
           <p className="text-body-sm text-on-surface-variant">Riwayat review yang pernah Anda tulis</p>
@@ -116,7 +116,7 @@ export default function UserReviewsPage() {
                   </div>
                   {review.comment && <p className="text-body-md text-on-surface-variant mb-4">{review.comment}</p>}
                   {review.tags && review.tags.length > 0 && (
-                    <div className="flex gap-2 mb-4">
+                    <div className="flex flex-wrap gap-2 mb-4">
                       {review.tags.map((tag) => (
                         <span key={tag} className="rounded-full bg-surface-container-high px-2 py-0.5 text-[11px] text-on-surface-variant capitalize">{tag}</span>
                       ))}

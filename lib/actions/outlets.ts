@@ -279,3 +279,34 @@ export async function approveOutlet(outletId: string): Promise<ActionResult> {
 export async function rejectOutlet(outletId: string): Promise<ActionResult> {
   return setOutletStatus(outletId, "rejected", "reject");
 }
+
+/**
+ * Hapus permanen outlet (khusus admin, untuk pelanggaran berat). Semua data
+ * terkait — produk, review, foto, panorama, laporan, favorit — ikut terhapus
+ * lewat cascade di database. Untuk pelanggaran biasa gunakan rejectOutlet
+ * (reversibel). Snapshot outlet disimpan ke audit log sebelum dihapus.
+ */
+export async function deleteOutlet(outletId: string): Promise<ActionResult> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Unauthorized" };
+  if (!(await isAdmin(supabase, user.id))) {
+    return { success: false, error: "Hanya admin yang dapat menghapus outlet." };
+  }
+
+  const { data: before } = await supabase.from("outlets").select("*").eq("id", outletId).single();
+
+  const { data, error } = await supabase
+    .from("outlets")
+    .delete()
+    .eq("id", outletId)
+    .select("id");
+
+  if (error) return { success: false, error: error.message };
+  if (!data || data.length === 0) {
+    return { success: false, error: "Outlet tidak ditemukan." };
+  }
+
+  await logAudit({ action: "delete", entityType: "outlets", entityId: outletId, before });
+  return { success: true };
+}

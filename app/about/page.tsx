@@ -53,7 +53,7 @@ export default function AboutPage() {
           </section>
 
           {/* Mission */}
-          <section className="rounded-2xl border border-outline-variant bg-surface-container-low p-8 md:p-12">
+          <section className="rounded-2xl border border-outline-variant bg-surface-container-low p-5 sm:p-8 md:p-12">
             <h2 className="font-heading text-h2 text-on-background">Visi & Misi</h2>
             <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="rounded-xl bg-surface p-6">

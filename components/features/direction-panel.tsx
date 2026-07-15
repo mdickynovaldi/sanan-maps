@@ -109,7 +109,7 @@ export function DirectionPanel({
               <span className="material-symbols-outlined text-sm" aria-hidden="true">content_copy</span>
               Salin Link Google Maps
             </Button>
-            <p aria-live="polite" className="mt-1 text-body-sm text-on-surface-variant">
+            <p aria-live="polite" className="mt-1 text-body-sm text-on-surface-variant break-all">
               {copyStatus}
             </p>
           </div>
