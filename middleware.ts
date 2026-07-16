@@ -1,7 +1,27 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+/**
+ * Middleware HANYA menyentuh sesi untuk rute /dashboard.
+ *
+ * Sebelumnya getUser() (yang bisa merotasi refresh token) berjalan di SEMUA
+ * request — termasuk prefetch Next.js untuk link halaman publik. Rotasi token
+ * di prefetch balapan dengan refresh milik Supabase client di browser, memicu
+ * deteksi "refresh token reuse" yang MEMATIKAN sesi — gejalanya: klik link
+ * dari dashboard ke halaman publik (logo, "Jelajahi Outlet") tampak
+ * "auto logout". Halaman publik tidak butuh sesi di middleware (query jalan
+ * dari browser client yang me-refresh tokennya sendiri).
+ */
 export async function middleware(request: NextRequest) {
+  // Jangan refresh token pada prefetch — hanya navigasi sungguhan.
+  if (
+    request.headers.get("next-router-prefetch") === "1" ||
+    request.headers.get("x-middleware-prefetch") === "1" ||
+    request.headers.get("purpose") === "prefetch"
+  ) {
+    return NextResponse.next();
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -39,7 +59,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/dashboard/:path*"],
 };

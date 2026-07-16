@@ -141,6 +141,7 @@ export const adminNavItems: NavItem[] = [
 
 export const userNavItems: NavItem[] = [
   { icon: "dashboard", label: "Dashboard", href: "/dashboard/user" },
+  { icon: "storefront", label: "Jelajah Outlet", href: "/outlets" },
   { icon: "favorite", label: "Favorites", href: "/dashboard/user/favorites" },
   { icon: "rate_review", label: "Reviews", href: "/dashboard/user/reviews" },
   { icon: "flag", label: "Laporan Saya", href: "/dashboard/user/reports" },
