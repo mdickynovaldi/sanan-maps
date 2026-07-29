@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/layout/logo";
+import { TempeOrnament, TempePattern } from "@/components/decor/tempe-ornaments";
 import { signOut } from "@/lib/actions/auth";
 
 type NavItem = {
@@ -62,6 +63,11 @@ export function DashboardNav({ title, subtitle, items, cta }: DashboardNavProps)
     </nav>
 
     <nav className="hidden md:flex fixed left-0 top-0 h-full w-[280px] border-r border-slate-200 bg-slate-50 p-4 flex-col gap-2 z-40 overflow-y-auto">
+      {/* Watermark tempe di belakang menu — dekoratif murni */}
+      <TempePattern patternId="tempe-pattern-sidebar" size={170} className="-z-10 text-amber-700 opacity-[0.035]" />
+      {/* Offset negatif hanya di sisi kiri/atas agar tidak memicu scrollbar
+          pada kontainer overflow-y-auto */}
+      <TempeOrnament motif="wrap" rotate={-10} className="-z-10 -left-8 bottom-24 h-36 w-36 text-amber-700 opacity-[0.06]" />
       {/* Logo mengarah ke beranda dashboard, BUKAN situs publik — klik logo
           sempat dikira "auto logout" karena melempar user keluar dashboard. */}
       <Link href={items[0]?.href ?? "/"} className="mb-6 flex items-center gap-2.5 px-4 py-2">

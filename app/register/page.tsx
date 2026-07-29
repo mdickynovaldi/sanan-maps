@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/header";
 import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
+import { TempeOrnament, TempePattern } from "@/components/decor/tempe-ornaments";
 import { signUp } from "@/lib/actions/auth";
 
 type FieldErrors = {
@@ -84,23 +85,26 @@ export default function RegisterPage() {
       <Header />
       <main className="min-h-[calc(100vh-4.5rem)] bg-background">
         <div className="mx-auto grid min-h-[calc(100vh-4.5rem)] max-w-[1280px] grid-cols-1 lg:grid-cols-2">
-          <div className="hidden lg:flex flex-col justify-between bg-surface-variant p-12 text-surface-container-lowest">
-            <div>
+          <div className="relative overflow-hidden hidden lg:flex flex-col justify-between bg-surface-variant p-12 text-on-surface">
+            <TempePattern patternId="tempe-register-panel" size={200} className="text-primary opacity-[0.04]" />
+            <TempeOrnament motif="wrap" rotate={-10} strokeWidth={1.5} className="-right-14 top-1/3 h-64 w-64 text-primary opacity-[0.08]" />
+            <div className="relative">
               <div className="mb-8 flex items-center gap-2">
                 <Logo className="h-9 w-9" />
                 <span className="font-heading text-h3">Sanan Explorer</span>
               </div>
             </div>
-            <div>
+            <div className="relative">
               <h1 className="font-heading text-h1 mb-4">Join the community.</h1>
-              <p className="text-body-lg text-surface-container-low">
+              <p className="text-body-lg text-on-surface-variant">
                 Daftarkan akun untuk menyimpan favorit, menulis ulasan, dan mendukung UMKM lokal Sanan.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center justify-center p-6 sm:p-12">
-            <div className="w-full max-w-[400px] flex flex-col gap-8">
+          <div className="relative overflow-hidden flex items-center justify-center p-6 sm:p-12">
+            <TempeOrnament motif="soybean" rotate={14} className="-bottom-8 -right-8 h-32 w-32 text-primary opacity-[0.05]" />
+            <div className="relative w-full max-w-[400px] flex flex-col gap-8">
               <div className="text-center lg:text-left">
                 <h2 className="font-heading text-h2 text-on-surface">Create an account</h2>
                 <p className="mt-2 text-body-md text-on-surface-variant">Enter your details below to join the community.</p>

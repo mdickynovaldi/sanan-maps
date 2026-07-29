@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DashboardNav, adminNavItems } from "@/components/layout/dashboard-nav";
+import { TempeOrnament } from "@/components/decor/tempe-ornaments";
 import { PanoramaForm } from "@/components/features/panorama-form";
 import { StreetViewChecker } from "@/components/features/street-view-checker";
 import { PanoramaViewer, type PanoramaData } from "@/components/features/panorama-viewer";
@@ -97,8 +98,10 @@ export default function AdminPanoramasPage() {
       />
 
       <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
-        <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-center justify-between">
-          <div>
+        <header className="relative overflow-hidden mb-8 flex flex-col gap-4 md:flex-row md:items-center justify-between">
+          <TempeOrnament motif="wrap" rotate={-10} className="-right-4 -top-4 h-24 w-24 opacity-[0.06]" />
+          <TempeOrnament motif="soybean" rotate={14} className="-bottom-5 right-24 h-14 w-14 opacity-[0.05]" />
+          <div className="relative">
             <h2 className="font-heading text-h2 text-on-surface">Kelola Panorama 360°</h2>
             <p className="text-body-sm text-on-surface-variant">
               Upload dan kelola foto panorama untuk semua outlet
@@ -106,7 +109,7 @@ export default function AdminPanoramasPage() {
           </div>
           <Button
             onClick={() => setShowForm(!showForm)}
-            className="bg-primary-container text-on-primary-container"
+            className="relative bg-primary-container text-on-primary-container"
             disabled={!selectedOutlet}
           >
             <span className="material-symbols-outlined text-sm">{showForm ? "close" : "add"}</span>

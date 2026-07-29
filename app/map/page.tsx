@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Header } from "@/components/layout/header";
 import { useAccessibility } from "@/components/providers/accessibility-provider";
 import { Footer } from "@/components/layout/footer";
+import { TempeOrnament } from "@/components/decor/tempe-ornaments";
 import { Button } from "@/components/ui/button";
 import {
   Map,
@@ -296,8 +297,9 @@ export default function MapPage() {
           100dvh (bukan 100vh) agar tidak tertutup toolbar browser mobile. */}
       <main className="flex h-[calc(100dvh-4.5rem)] flex-col md:flex-row">
         <aside className="flex h-[40%] w-full flex-shrink-0 flex-col overflow-hidden border-b border-outline-variant bg-surface md:h-full md:w-[380px] md:border-b-0 md:border-r">
-          <div className="flex flex-col gap-3 border-b border-outline-variant bg-surface-container-low p-4 md:gap-4 md:p-6">
-            <div className="flex items-center justify-between">
+          <div className="relative flex flex-col gap-3 overflow-hidden border-b border-outline-variant bg-surface-container-low p-4 md:gap-4 md:p-6">
+            <TempeOrnament motif="wrap" rotate={-12} strokeWidth={1.5} className="-right-5 -top-5 h-24 w-24 opacity-[0.06]" />
+            <div className="relative flex items-center justify-between">
               <h2 className="font-heading text-h3 text-on-surface">Direktori UMKM</h2>
               <span className="material-symbols-outlined text-on-surface-variant" aria-hidden="true">tune</span>
             </div>

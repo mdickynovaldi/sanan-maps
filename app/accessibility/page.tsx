@@ -1,13 +1,15 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { TempeOrnament } from "@/components/decor/tempe-ornaments";
 
 export default function AccessibilityPage() {
   return (
     <>
       <Header activeNav="accessibility" />
       <main id="main-content" className="flex-1">
-        <div className="mx-auto max-w-[1280px] px-6 py-12">
-          <div className="mb-12 max-w-3xl">
+        <div className="relative mx-auto max-w-[1280px] overflow-hidden px-6 py-12">
+          <TempeOrnament motif="wrap" rotate={-8} strokeWidth={1.5} className="-right-10 top-2 h-48 w-48 opacity-[0.05]" />
+          <div className="relative mb-12 max-w-3xl">
             <h1 className="font-heading text-h1 text-on-background">Aksesibilitas</h1>
             <p className="mt-4 text-body-lg text-on-surface-variant">
               Sanan Explorer berkomitmen untuk memastikan semua pengguna dapat mengakses informasi UMKM Sanan dengan mudah,
@@ -63,7 +65,8 @@ export default function AccessibilityPage() {
             ))}
           </div>
 
-          <div className="mt-12 rounded-2xl border border-outline-variant bg-surface-container-low p-8">
+          <div className="relative mt-12 overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-low p-8">
+            <TempeOrnament motif="soybean" rotate={-12} className="-bottom-8 -right-8 h-36 w-36 opacity-[0.06]" />
             <h2 className="font-heading text-h2 text-on-background">Fitur Aksesibilitas di Halaman Ini</h2>
             <ul className="mt-4 list-disc list-inside space-y-2 text-body-md text-on-surface-variant">
               <li>Skip-to-content links untuk navigasi cepat</li>

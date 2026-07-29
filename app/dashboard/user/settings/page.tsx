@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { TempeOrnament, TempePattern } from "@/components/decor/tempe-ornaments";
 import { DashboardNav, userNavItems } from "@/components/layout/dashboard-nav";
 import {
   useAccessibility,
@@ -86,13 +87,15 @@ export default function UserSettingsPage() {
     <div className="min-h-screen flex bg-background text-on-background">
       <DashboardNav title="Sanan Explorer" subtitle="User Dashboard" items={userNavItems} />
 
-      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
-        <header className="mb-8">
+      <main className="relative flex-1 overflow-hidden md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
+        <TempePattern patternId="tempe-user-settings" size={210} className="opacity-[0.03]" />
+        <header className="relative mb-8 overflow-hidden">
+          <TempeOrnament motif="wrap" rotate={8} className="-right-6 -top-10 h-32 w-32 opacity-[0.07]" />
           <h2 className="font-heading text-h2 text-on-surface">Accessibility Preferences</h2>
           <p className="text-body-sm text-on-surface-variant">Atur preferensi pengalaman aksesibilitas Anda</p>
         </header>
 
-        <div aria-live="polite" className="mb-4 max-w-[800px]">
+        <div aria-live="polite" className="relative mb-4 max-w-[800px]">
           {saveError ? (
             <div className="rounded-lg bg-error-container p-3 text-body-sm text-on-error-container" role="alert">
               {saveError}
@@ -103,7 +106,7 @@ export default function UserSettingsPage() {
           ) : null}
         </div>
 
-        <div className="space-y-4 max-w-[800px]">
+        <div className="relative space-y-4 max-w-[800px]">
           {preferences.map((pref) => {
             const enabled = Boolean(prefs[pref.key]);
             return (

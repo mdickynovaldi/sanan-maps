@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { TempeOrnament, TempeDivider } from "@/components/decor/tempe-ornaments";
 
 export default function AboutPage() {
   return (
@@ -9,8 +10,9 @@ export default function AboutPage() {
       <main className="flex-1">
         <div className="mx-auto max-w-[1280px] px-6 py-12">
           {/* Hero */}
-          <section className="mb-16 grid grid-cols-1 items-center gap-12 md:grid-cols-2">
-            <div className="space-y-6">
+          <section className="relative mb-16 grid grid-cols-1 items-center gap-12 overflow-hidden md:grid-cols-2">
+            <TempeOrnament motif="wrap" rotate={-10} strokeWidth={1.5} className="-left-12 -top-10 h-52 w-52 opacity-[0.05]" />
+            <div className="relative space-y-6">
               <span className="inline-flex items-center gap-2 rounded-full border border-outline-variant bg-surface-container-high px-3 py-1 text-label-caps text-on-surface-variant">
                 <span className="material-symbols-outlined text-[16px] text-primary">location_on</span>
                 Kelurahan Purwantoro, Malang
@@ -52,8 +54,11 @@ export default function AboutPage() {
             ))}
           </section>
 
+          <TempeDivider className="-mt-8 mb-8" />
+
           {/* Mission */}
-          <section className="rounded-2xl border border-outline-variant bg-surface-container-low p-5 sm:p-8 md:p-12">
+          <section className="relative overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-low p-5 sm:p-8 md:p-12">
+            <TempeOrnament motif="soybean" rotate={12} className="-bottom-8 -right-8 h-40 w-40 opacity-[0.06]" />
             <h2 className="font-heading text-h2 text-on-background">Visi & Misi</h2>
             <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="rounded-xl bg-surface p-6">

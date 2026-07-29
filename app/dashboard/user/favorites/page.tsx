@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { TempeOrnament } from "@/components/decor/tempe-ornaments";
 import { DashboardNav, userNavItems } from "@/components/layout/dashboard-nav";
 import { createClient } from "@/lib/supabase/client";
 import { getCategoryThumbnail } from "@/lib/thumbnails";
@@ -126,8 +127,10 @@ export default function UserFavoritesPage() {
     <div className="min-h-screen flex bg-background text-on-background">
       <DashboardNav title="Sanan Explorer" subtitle="User Dashboard" items={userNavItems} />
 
-      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
-        <header className="mb-8">
+      <main className="relative flex-1 overflow-hidden md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
+        <TempeOrnament motif="keripik" rotate={-10} strokeWidth={1.5} className="-bottom-12 -left-10 h-44 w-44 opacity-[0.04]" />
+        <header className="relative mb-8 overflow-hidden">
+          <TempeOrnament motif="wrap" rotate={8} className="-right-6 -top-10 h-32 w-32 opacity-[0.06]" />
           <h2 className="font-heading text-h2 text-on-surface">Favorite Outlets</h2>
           <p className="text-body-sm text-on-surface-variant">Outlet yang Anda simpan untuk dikunjungi nanti</p>
         </header>
@@ -141,13 +144,14 @@ export default function UserFavoritesPage() {
         {loading ? (
           <div className="text-center py-12 text-on-surface-variant" role="status">Loading...</div>
         ) : favorites.length === 0 ? (
-          <div className="rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+          <div className="relative overflow-hidden rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+            <TempeOrnament motif="soybean" rotate={12} className="-bottom-9 -left-8 h-28 w-28 opacity-[0.06]" />
             <span className="material-symbols-outlined text-4xl mb-2 block" aria-hidden="true">favorite_border</span>
             <p>Belum ada outlet favorit. Jelajahi outlet dan simpan yang Anda suka!</p>
             <Link href="/outlets" className="text-primary hover:underline mt-2 inline-block">Jelajahi Outlet</Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {favorites.map((outlet) => (
               <div key={outlet.id} className="rounded-xl border border-outline-variant bg-surface overflow-hidden shadow-sm">
                 <div className="relative h-48 bg-surface-container-high">

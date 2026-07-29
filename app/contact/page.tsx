@@ -3,14 +3,16 @@ import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
+import { TempeOrnament, TempeDivider } from "@/components/decor/tempe-ornaments";
 
 export default function ContactPage() {
   return (
     <>
       <Header activeNav="about" />
       <main className="flex-1">
-        <div className="mx-auto max-w-[1280px] px-6 py-12">
-          <div className="mb-12">
+        <div className="relative mx-auto max-w-[1280px] overflow-hidden px-6 py-12">
+          <TempeOrnament motif="wrap" rotate={-8} strokeWidth={1.5} className="-right-10 -top-10 h-40 w-40 opacity-[0.05]" />
+          <div className="relative mb-12">
             <h1 className="font-heading text-h1 text-on-background mb-4">Hubungi Kami</h1>
             <p className="text-body-lg text-on-surface-variant">
               Punya pertanyaan, saran, atau ingin mendaftarkan UMKM Anda? Kami siap membantu!
@@ -128,8 +130,11 @@ export default function ContactPage() {
             </Card>
           </div>
 
+          <TempeDivider className="-mt-4 mb-8" />
+
           {/* FAQ Section */}
-          <section className="rounded-2xl border border-outline-variant bg-surface-container-low p-5 sm:p-8">
+          <section className="relative overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-low p-5 sm:p-8">
+            <TempeOrnament motif="keripik" rotate={15} className="-bottom-10 -right-10 h-44 w-44 opacity-[0.05]" />
             <h2 className="font-heading text-h2 text-on-background mb-6">Pertanyaan Umum</h2>
             <div className="space-y-4">
               {[

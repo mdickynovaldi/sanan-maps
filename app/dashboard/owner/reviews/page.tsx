@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DashboardNav, ownerNavItems } from "@/components/layout/dashboard-nav";
+import { TempeOrnament } from "@/components/decor/tempe-ornaments";
 import { createClient } from "@/lib/supabase/client";
 
 type ReviewRow = {
@@ -86,8 +87,9 @@ export default function OwnerReviewsPage() {
         cta={{ label: "Add New Product", href: "/dashboard/owner/products", icon: "add" }}
       />
 
-      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
-        <header className="mb-8">
+      <main className="relative overflow-hidden flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
+        <TempeOrnament motif="wrap" rotate={-12} className="-right-8 -top-8 h-36 w-36 opacity-[0.06]" />
+        <header className="relative mb-8">
           <h2 className="font-heading text-h2 text-on-surface">Outlet Reviews</h2>
           <p className="text-body-sm text-on-surface-variant">
             {outletName ? `Review pelanggan untuk ${outletName}` : "Review pelanggan outlet Anda"}
@@ -103,7 +105,8 @@ export default function OwnerReviewsPage() {
         {loading ? (
           <div className="text-center py-12 text-on-surface-variant" role="status">Loading...</div>
         ) : !hasOutlet ? (
-          <div className="rounded-xl border border-outline-variant bg-surface p-8 text-center">
+          <div className="relative overflow-hidden rounded-xl border border-outline-variant bg-surface p-8 text-center">
+            <TempeOrnament motif="soybean" rotate={15} className="-right-6 -bottom-6 h-24 w-24 opacity-[0.06]" />
             <p className="text-body-md text-on-surface mb-4">
               Anda belum memiliki outlet. Daftarkan outlet terlebih dahulu.
             </p>
@@ -156,7 +159,8 @@ export default function OwnerReviewsPage() {
               );
             })}
             {reviews.length === 0 && (
-              <div className="rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+              <div className="relative overflow-hidden rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+                <TempeOrnament motif="soybean" rotate={15} className="-right-6 -bottom-6 h-24 w-24 opacity-[0.06]" />
                 Belum ada review untuk outlet Anda.
               </div>
             )}

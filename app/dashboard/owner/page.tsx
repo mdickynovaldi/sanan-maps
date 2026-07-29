@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DashboardNav, ownerNavItems } from "@/components/layout/dashboard-nav";
+import { TempeOrnament } from "@/components/decor/tempe-ornaments";
 import { OutletForm } from "@/components/features/outlet-form";
 import {
   OpeningHoursField,
@@ -164,8 +165,9 @@ export default function OwnerDashboardPage() {
         cta={{ label: "Add New Product", href: "/dashboard/owner/products", icon: "add" }}
       />
 
-      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
-        <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-center justify-between">
+      <main className="relative overflow-hidden flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
+        <TempeOrnament motif="wrap" rotate={-12} className="-right-8 -top-8 h-36 w-36 opacity-[0.06]" />
+        <header className="relative mb-8 flex flex-col gap-4 md:flex-row md:items-center justify-between">
           <div>
             <h1 className="font-heading text-h1 text-on-background">My Outlet</h1>
             <p className="text-body-md text-on-surface-variant mt-1">
@@ -202,7 +204,8 @@ export default function OwnerDashboardPage() {
         {/* ===== Belum punya outlet: form pendaftaran ===== */}
         {!loading && !loadError && !outlet && (
           <div className="max-w-[860px]">
-            <div className="mb-6 rounded-xl border border-outline-variant bg-surface-container-low p-6 flex gap-4">
+            <div className="relative overflow-hidden mb-6 rounded-xl border border-outline-variant bg-surface-container-low p-6 flex gap-4">
+              <TempeOrnament motif="soybean" rotate={15} className="-right-6 -bottom-6 h-24 w-24 opacity-[0.06]" />
               <span className="material-symbols-outlined text-primary text-3xl" aria-hidden="true">storefront</span>
               <div>
                 <h2 className="font-heading text-h3 text-on-surface">Daftarkan Outlet Anda</h2>
@@ -335,7 +338,7 @@ export default function OwnerDashboardPage() {
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-6 space-y-3">
+                  <div className="relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest p-6 space-y-3">
                     <h3 className="font-heading text-h3 text-on-surface mb-2">Quick Links</h3>
                     <Link href="/dashboard/owner/products" className="flex items-center gap-3 rounded-lg border border-outline-variant p-3 hover:bg-surface-container-low transition-colors">
                       <span className="material-symbols-outlined text-primary" aria-hidden="true">inventory_2</span>
@@ -349,6 +352,7 @@ export default function OwnerDashboardPage() {
                       <span className="material-symbols-outlined text-primary" aria-hidden="true">panorama</span>
                       <span className="text-body-md text-on-surface">Kelola Panorama 360°</span>
                     </Link>
+                    <TempeOrnament motif="soybean" rotate={15} className="-right-6 -bottom-6 h-24 w-24 opacity-[0.06]" />
                   </div>
 
                   <Button type="submit" disabled={saving} className="w-full bg-primary-container text-on-primary-container">

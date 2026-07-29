@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { TempeOrnament, TempePattern, TempeDivider, KeripikIcon } from "@/components/decor/tempe-ornaments";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { isOutletOpenNow } from "@/lib/geo";
@@ -113,11 +114,13 @@ export default function Home() {
       <Header activeNav="explore" />
       <main id="main-content" className="flex-1">
         <section className="relative overflow-hidden py-16 md:py-24 bg-[var(--gradient-hero)]">
-          <div className="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-12 px-6 lg:grid-cols-2">
+          <TempeOrnament motif="wrap" rotate={-12} strokeWidth={1.5} className="-bottom-14 -left-12 h-64 w-64 text-primary opacity-[0.06]" />
+          <TempeOrnament motif="soybean" rotate={18} strokeWidth={1.5} className="-top-8 right-1/3 h-32 w-32 text-primary opacity-[0.05]" />
+          <div className="relative mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-12 px-6 lg:grid-cols-2">
             <div className="flex flex-col gap-8">
               <div className="space-y-4">
                 <span className="inline-flex items-center gap-2 rounded-full border border-outline-variant bg-surface-container-high px-3 py-1 text-label-caps text-on-surface-variant">
-                  <span className="material-symbols-outlined text-[16px] text-primary" aria-hidden="true">location_on</span>
+                  <KeripikIcon className="h-4 w-4 text-primary" strokeWidth={3} />
                   Sentra Industri Keripik Tempe
                 </span>
                 <h1 className="font-heading text-h1 text-on-background">
@@ -187,8 +190,11 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-surface-container py-20">
-          <div className="mx-auto max-w-[1280px] space-y-10 px-6">
+        <TempeDivider className="py-6" />
+
+        <section className="relative overflow-hidden bg-surface-container py-20">
+          <TempePattern patternId="tempe-pattern-home-featured" size={220} className="text-primary opacity-[0.04]" />
+          <div className="relative mx-auto max-w-[1280px] space-y-10 px-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div>
                 <h2 className="font-heading text-h2 text-on-background">Outlet Unggulan</h2>

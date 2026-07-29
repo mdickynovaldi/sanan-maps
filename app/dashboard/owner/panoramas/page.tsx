@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DashboardNav, ownerNavItems } from "@/components/layout/dashboard-nav";
+import { TempeOrnament } from "@/components/decor/tempe-ornaments";
 import { PanoramaForm } from "@/components/features/panorama-form";
 import { StreetViewChecker } from "@/components/features/street-view-checker";
 import { PanoramaViewer, type PanoramaData } from "@/components/features/panorama-viewer";
@@ -91,8 +92,9 @@ export default function OwnerPanoramasPage() {
         cta={{ label: "Tambah Panorama", href: "#", icon: "add" }}
       />
 
-      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
-        <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-center justify-between">
+      <main className="relative overflow-hidden flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
+        <TempeOrnament motif="wrap" rotate={-12} className="-right-8 -top-8 h-36 w-36 opacity-[0.06]" />
+        <header className="relative mb-8 flex flex-col gap-4 md:flex-row md:items-center justify-between">
           <div>
             <h2 className="font-heading text-h2 text-on-surface">Panorama 360°</h2>
             <p className="text-body-sm text-on-surface-variant">
@@ -112,7 +114,8 @@ export default function OwnerPanoramasPage() {
         {loading ? (
           <div className="text-center py-12 text-on-surface-variant">Loading...</div>
         ) : !outlet ? (
-          <div className="rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+          <div className="relative overflow-hidden rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+            <TempeOrnament motif="soybean" rotate={15} className="-right-6 -bottom-6 h-24 w-24 opacity-[0.06]" />
             Anda belum memiliki outlet. Hubungi admin untuk mendaftarkan outlet.
           </div>
         ) : (
@@ -184,7 +187,8 @@ export default function OwnerPanoramasPage() {
                 </div>
               ))}
               {panoramas.length === 0 && (
-                <div className="col-span-full rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+                <div className="relative overflow-hidden col-span-full rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+                  <TempeOrnament motif="soybean" rotate={15} className="-right-6 -bottom-6 h-24 w-24 opacity-[0.06]" />
                   <span className="material-symbols-outlined text-5xl mb-2 block">panorama</span>
                   <p className="text-body-md">Belum ada panorama 360°</p>
                   <p className="text-body-sm text-on-surface-variant/60 mt-1">

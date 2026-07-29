@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { TempeDivider, TempeOrnament } from "@/components/decor/tempe-ornaments";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useParams } from "next/navigation";
@@ -219,8 +220,9 @@ export default function OutletDetailPage() {
               </div>
             </div>
 
-            <div className="lg:col-span-5 flex flex-col justify-center rounded-xl border border-surface-variant bg-surface p-6 shadow-sm">
-              <div className="flex items-start justify-between">
+            <div className="relative lg:col-span-5 flex flex-col justify-center overflow-hidden rounded-xl border border-surface-variant bg-surface p-6 shadow-sm">
+              <TempeOrnament motif="wrap" rotate={12} strokeWidth={1.5} className="-right-10 -bottom-10 h-44 w-44 opacity-[0.06]" />
+              <div className="relative flex items-start justify-between">
                 <div>
                   <div className="mb-2 flex items-center gap-2">
                     <span className="rounded-full bg-surface-container-high px-2 py-1 text-[10px] font-semibold uppercase text-on-surface-variant">Outlet</span>
@@ -325,6 +327,8 @@ export default function OutletDetailPage() {
               </CardContent>
             </Card>
           </section>
+
+          <TempeDivider className="mb-8" />
 
           <section className="mb-8">
             <div className="flex overflow-x-auto no-scrollbar border-b border-outline-variant mb-6">
@@ -437,6 +441,8 @@ export default function OutletDetailPage() {
               />
             )}
           </section>
+
+          <TempeDivider className="mb-8" />
 
           {/* Direction Panel */}
           <section className="mb-8">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DashboardNav, adminNavItems } from "@/components/layout/dashboard-nav";
+import { TempeOrnament } from "@/components/decor/tempe-ornaments";
 import { signOut } from "@/lib/actions/auth";
 import { createClient } from "@/lib/supabase/client";
 
@@ -136,14 +137,16 @@ export default function AdminDashboardPage() {
       <DashboardNav title="Mitra Sanan" subtitle="Management Portal" items={adminNavItems} />
 
       <main className="flex-1 md:ml-[280px] flex flex-col h-full overflow-y-auto bg-surface-container-lowest">
-        <header className="sticky top-0 z-40 flex flex-wrap justify-between items-center gap-2 bg-surface/95 backdrop-blur-md border-b border-outline-variant px-4 py-3 md:px-8 md:py-4 shadow-[var(--shadow-level-1)]">
-          <div className="flex items-center gap-4">
+        <header className="sticky top-0 z-40 overflow-hidden flex flex-wrap justify-between items-center gap-2 bg-surface/95 backdrop-blur-md border-b border-outline-variant px-4 py-3 md:px-8 md:py-4 shadow-[var(--shadow-level-1)]">
+          <TempeOrnament motif="wrap" rotate={-10} className="-right-4 -top-4 h-24 w-24 opacity-[0.06]" />
+          <TempeOrnament motif="soybean" rotate={14} className="-bottom-5 right-24 h-14 w-14 opacity-[0.05]" />
+          <div className="relative flex items-center gap-4">
             <h2 className="font-heading text-h2 text-on-surface">System Overview</h2>
             {!loading && !error && (
               <span className="rounded-full border border-primary-container/30 bg-primary-container/20 px-3 py-1 text-label-caps text-on-primary-container">Live Data</span>
             )}
           </div>
-          <form action={signOut}>
+          <form action={signOut} className="relative">
             <Button type="submit" variant="ghost" className="text-red-600 hover:bg-red-50">
               <span className="material-symbols-outlined" aria-hidden="true">logout</span>
               Logout

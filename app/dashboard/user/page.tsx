@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
+import { TempeDivider, TempeOrnament } from "@/components/decor/tempe-ornaments";
 import { DashboardNav, userNavItems } from "@/components/layout/dashboard-nav";
 import {
   useAccessibility,
@@ -171,8 +172,9 @@ export default function UserDashboardPage() {
           </div>
         ) : profile ? (
           <>
-            <header className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div>
+            <header className="relative mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 overflow-hidden">
+              <TempeOrnament motif="wrap" rotate={-12} className="-left-8 -top-9 h-32 w-32 opacity-[0.06]" />
+              <div className="relative">
                 <h2 className="font-heading text-h2 text-on-background mb-1">Welcome back, {displayName}!</h2>
                 <p className="text-body-sm text-on-surface-variant">Ready to explore more of Sanan today?</p>
               </div>
@@ -212,9 +214,12 @@ export default function UserDashboardPage() {
               ))}
             </div>
 
+            <TempeDivider className="-mt-3 mb-5" />
+
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
               {/* Favorite Outlets */}
-              <section className="md:col-span-8 rounded-xl border border-outline-variant/30 bg-surface p-6">
+              <section className="relative md:col-span-8 overflow-hidden rounded-xl border border-outline-variant/30 bg-surface p-6">
+                <TempeOrnament motif="soybean" rotate={14} className="-bottom-8 -right-7 h-28 w-28 opacity-[0.05]" />
                 <div className="mb-6 flex items-center justify-between">
                   <h3 className="font-heading text-h3 text-on-surface">Favorite Outlets</h3>
                   <Link href="/dashboard/user/favorites" className="text-body-sm text-primary hover:underline">View All</Link>
@@ -228,7 +233,7 @@ export default function UserDashboardPage() {
                     Belum ada outlet favorit. Jelajahi peta untuk menambahkan.
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {favorites.slice(0, 4).map((outlet) => (
                       <Card key={outlet.id} className="overflow-hidden">
                         <div className="relative h-32 bg-surface-container-high">

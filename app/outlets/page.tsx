@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { TempeOrnament, TempePattern } from "@/components/decor/tempe-ornaments";
 import { Button } from "@/components/ui/button";
 import { isOutletOpenNow } from "@/lib/geo";
 import { getCategoryThumbnail } from "@/lib/thumbnails";
@@ -192,8 +193,10 @@ export default function OutletsPage() {
       <Header activeNav="outlets" />
       <main id="main-content" className="flex flex-1 flex-col">
         <div className="mx-auto w-full max-w-[1280px] p-6">
-          <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-            <div>
+          <div className="relative mb-8 flex flex-col gap-4 overflow-hidden md:flex-row md:items-end md:justify-between">
+            <TempeOrnament motif="wrap" rotate={-10} strokeWidth={1.5} className="-right-8 -top-10 h-40 w-40 opacity-[0.07]" />
+            <TempeOrnament motif="soybean" rotate={14} className="-left-6 -bottom-8 h-24 w-24 opacity-[0.05]" />
+            <div className="relative">
               <h1 className="font-heading text-h1 text-on-background">Outlet Aksesibel</h1>
               <p className="text-body-lg text-on-surface-variant">Daftar outlet dengan informasi aksesibilitas terperinci.</p>
             </div>
@@ -202,9 +205,10 @@ export default function OutletsPage() {
             </Button>
           </div>
 
-          <section aria-labelledby="filter-heading" className="mb-8 space-y-4 rounded-xl border border-outline-variant bg-surface-container p-6 shadow-sm">
+          <section aria-labelledby="filter-heading" className="relative mb-8 space-y-4 overflow-hidden rounded-xl border border-outline-variant bg-surface-container p-6 shadow-sm">
+            <TempePattern patternId="tempe-pattern-outlets-filter" size={200} className="text-primary opacity-[0.04]" />
             <h2 id="filter-heading" className="sr-only">Saring Daftar Outlet</h2>
-            <div className="flex flex-col gap-4 md:flex-row md:items-end">
+            <div className="relative flex flex-col gap-4 md:flex-row md:items-end">
               <div className="flex-1">
                 <label htmlFor="local-search" className="mb-2 block text-body-sm font-semibold text-on-surface">Cari berdasarkan Nama atau Landmark</label>
                 <div className="relative">

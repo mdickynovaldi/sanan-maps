@@ -1,14 +1,18 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import Link from "next/link";
+import { TempeOrnament, TempeDivider } from "@/components/decor/tempe-ornaments";
 
 export default function PrivacyPage() {
   return (
     <>
       <Header activeNav="about" />
       <main className="flex-1">
-        <div className="mx-auto max-w-[800px] px-6 py-12">
-          <h1 className="font-heading text-h1 text-on-background mb-8">Privacy Policy</h1>
+        <div className="relative mx-auto max-w-[800px] overflow-hidden px-6 py-12">
+          <TempeOrnament motif="wrap" rotate={-8} strokeWidth={1.5} className="-right-14 -top-6 h-44 w-44 opacity-[0.045]" />
+          <h1 className="relative font-heading text-h1 text-on-background mb-8">Privacy Policy</h1>
+
+          <TempeDivider className="-mt-3 mb-8" />
 
           <div className="prose prose-slate max-w-none">
             <section className="mb-8">

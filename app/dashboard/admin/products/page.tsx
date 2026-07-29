@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DashboardNav, adminNavItems } from "@/components/layout/dashboard-nav";
+import { TempeOrnament } from "@/components/decor/tempe-ornaments";
 import { ProductForm } from "@/components/features/product-form";
 import { deleteProduct } from "@/lib/actions/products";
 import { createClient } from "@/lib/supabase/client";
@@ -75,8 +76,10 @@ export default function AdminProductsPage() {
       <DashboardNav title="Mitra Sanan" subtitle="Management Portal" items={adminNavItems} />
 
       <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
-        <header className="mb-8 flex items-center justify-between">
-          <div>
+        <header className="relative overflow-hidden mb-8 flex items-center justify-between">
+          <TempeOrnament motif="wrap" rotate={-10} className="-right-4 -top-4 h-24 w-24 opacity-[0.06]" />
+          <TempeOrnament motif="soybean" rotate={14} className="-bottom-5 right-24 h-14 w-14 opacity-[0.05]" />
+          <div className="relative">
             <h2 className="font-heading text-h2 text-on-surface">Produk / Menu</h2>
             <p className="text-body-sm text-on-surface-variant">Kelola semua produk dari outlet UMKM</p>
           </div>

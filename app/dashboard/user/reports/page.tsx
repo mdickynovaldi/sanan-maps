@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { TempeOrnament } from "@/components/decor/tempe-ornaments";
 import { DashboardNav, userNavItems } from "@/components/layout/dashboard-nav";
 import { getMyReports } from "@/lib/actions/reports";
 
@@ -54,8 +55,10 @@ export default function UserReportsPage() {
     <div className="min-h-screen flex bg-background text-on-background">
       <DashboardNav title="Sanan Explorer" subtitle="User Dashboard" items={userNavItems} />
 
-      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
-        <header className="mb-8">
+      <main className="relative flex-1 overflow-hidden md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
+        <TempeOrnament motif="keripik" rotate={-8} strokeWidth={1.5} className="-bottom-12 -left-10 h-44 w-44 opacity-[0.04]" />
+        <header className="relative mb-8 overflow-hidden">
+          <TempeOrnament motif="wrap" rotate={10} className="-right-6 -top-10 h-32 w-32 opacity-[0.06]" />
           <h2 className="font-heading text-h2 text-on-surface">Laporan Saya</h2>
           <p className="text-body-sm text-on-surface-variant">
             Lacak status laporan data yang pernah Anda kirim dari halaman outlet.
@@ -71,13 +74,14 @@ export default function UserReportsPage() {
         {loading ? (
           <div className="text-center py-12 text-on-surface-variant" role="status">Memuat laporan...</div>
         ) : reports.length === 0 ? (
-          <div className="rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+          <div className="relative overflow-hidden rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+            <TempeOrnament motif="soybean" rotate={-14} className="-bottom-9 -right-8 h-28 w-28 opacity-[0.06]" />
             <span className="material-symbols-outlined text-4xl mb-2 block" aria-hidden="true">flag</span>
             <p>Belum ada laporan. Menemukan data yang salah? Gunakan tombol &quot;Laporkan&quot; di halaman outlet.</p>
             <Link href="/outlets" className="text-primary hover:underline mt-2 inline-block">Jelajahi Outlet</Link>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="relative space-y-4">
             {reports.map((report) => {
               const status = STATUS_LABELS[report.status] ?? STATUS_LABELS.open;
               return (

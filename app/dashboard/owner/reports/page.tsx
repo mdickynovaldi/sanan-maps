@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { DashboardNav, ownerNavItems } from "@/components/layout/dashboard-nav";
+import { TempeOrnament } from "@/components/decor/tempe-ornaments";
 import { getReportsForMyOutlets } from "@/lib/actions/reports";
 
 type ReportRow = {
@@ -54,8 +55,9 @@ export default function OwnerReportsPage() {
     <div className="min-h-screen flex bg-background text-on-background">
       <DashboardNav title="Sanan Explorer" subtitle="Owner Dashboard" items={ownerNavItems} />
 
-      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
-        <header className="mb-8">
+      <main className="relative overflow-hidden flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
+        <TempeOrnament motif="wrap" rotate={-12} className="-right-8 -top-8 h-36 w-36 opacity-[0.06]" />
+        <header className="relative mb-8">
           <h2 className="font-heading text-h2 text-on-surface">Laporan Pengunjung</h2>
           <p className="text-body-sm text-on-surface-variant">
             Masukan dari pengunjung tentang data outlet Anda — perbarui data outlet bila laporan benar,
@@ -72,7 +74,8 @@ export default function OwnerReportsPage() {
         {loading ? (
           <div className="text-center py-12 text-on-surface-variant" role="status">Memuat laporan...</div>
         ) : reports.length === 0 ? (
-          <div className="rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+          <div className="relative overflow-hidden rounded-xl border border-outline-variant bg-surface p-8 text-center text-on-surface-variant">
+            <TempeOrnament motif="soybean" rotate={15} className="-right-6 -bottom-6 h-24 w-24 opacity-[0.06]" />
             <span className="material-symbols-outlined text-4xl mb-2 block" aria-hidden="true">flag</span>
             <p>Belum ada laporan untuk outlet Anda. Itu pertanda data Anda akurat!</p>
           </div>

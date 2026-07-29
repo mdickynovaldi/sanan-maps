@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { TempeOrnament } from "@/components/decor/tempe-ornaments";
 import { DashboardNav, userNavItems } from "@/components/layout/dashboard-nav";
 import { deleteReview } from "@/lib/actions/reviews";
 import { createClient } from "@/lib/supabase/client";
@@ -67,8 +68,10 @@ export default function UserReviewsPage() {
     <div className="min-h-screen flex bg-background text-on-background">
       <DashboardNav title="Sanan Explorer" subtitle="User Dashboard" items={userNavItems} />
 
-      <main className="flex-1 md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
-        <header className="mb-8">
+      <main className="relative flex-1 overflow-hidden md:ml-[280px] p-6 pb-24 md:pb-6 max-w-[1280px] mx-auto w-full">
+        <TempeOrnament motif="soybean" rotate={16} strokeWidth={1.5} className="-bottom-10 -right-8 h-40 w-40 opacity-[0.04]" />
+        <header className="relative mb-8 overflow-hidden">
+          <TempeOrnament motif="wrap" rotate={-8} className="-right-6 -top-10 h-32 w-32 opacity-[0.06]" />
           <h2 className="font-heading text-h2 text-on-surface">Review Saya</h2>
           <p className="text-body-sm text-on-surface-variant">Riwayat review yang pernah Anda tulis</p>
         </header>
@@ -85,7 +88,7 @@ export default function UserReviewsPage() {
         {loading ? (
           <div className="text-center py-12 text-on-surface-variant" role="status">Loading...</div>
         ) : (
-          <div className="space-y-4">
+          <div className="relative space-y-4">
             {reviews.map((review) => {
               const status = STATUS_LABELS[review.status] ?? STATUS_LABELS.approved;
               return (
