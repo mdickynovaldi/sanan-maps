@@ -23,6 +23,7 @@ function LoginPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") ?? "";
+  const registered = searchParams.get("registered") === "true";
   const [error, setError] = useState<string | null>(null);
 
   // Sudah login? Jangan tampilkan form login lagi — langsung ke dashboard.
@@ -119,6 +120,12 @@ function LoginPageInner() {
                   <Link href="/register">Register</Link>
                 </Button>
               </div>
+
+              {registered && (
+                <div className="rounded-lg bg-surface-container p-3 text-body-sm text-on-surface" role="status">
+                  Pendaftaran berhasil. Jika konfirmasi email diperlukan, buka tautan di email sebelum login.
+                </div>
+              )}
 
               {error && (
                 <div id={errorId} className="rounded-lg bg-error-container p-3 text-body-sm text-on-error-container" role="alert" aria-live="assertive">

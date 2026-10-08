@@ -103,8 +103,8 @@ export async function signIn(formData: FormData): Promise<ActionResult> {
 
 export async function signUp(formData: FormData): Promise<ActionResult> {
   const raw = {
-    name: formData.get("name") as string,
-    email: formData.get("email") as string,
+    name: formData.get("name")?.toString().trim() ?? "",
+    email: formData.get("email")?.toString().trim() ?? "",
     password: formData.get("password") as string,
     confirmPassword: formData.get("confirmPassword") as string,
     role: (formData.get("role") as string) || "user",
@@ -115,31 +115,47 @@ export async function signUp(formData: FormData): Promise<ActionResult> {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Input tidak valid" };
   }
 
-  // Rate limit: 10 pendaftaran per 10 menit per IP (cegah pembuatan akun massal;
-  // dilonggarkan dari 3 agar tidak mengganggu fase QC/testing dari satu IP)
-  const ip = await getClientIp();
-  const rl = await checkRateLimit("signup", ip, 10, 600);
-  if (!rl.success) {
-    return { success: false, error: "Terlalu banyak percobaan pendaftaran. Coba lagi nanti." };
-  }
+  let stage = "rate-limit";
+  try {
+    const ip = await getClientIp();
+    const rl = await checkRateLimit("signup", ip, 10, 600);
+    if (!rl.success) {
+      return { success: false, error: "Terlalu banyak percobaan pendaftaran. Coba lagi nanti." };
+    }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
-    email: parsed.data.email,
-    password: parsed.data.password,
-    options: {
-      data: {
-        name: parsed.data.name,
-        role: parsed.data.role,
+    stage = "supabase-client";
+    const supabase = await createClient({ timeoutMs: 10_000 });
+    stage = "signup";
+    const { error } = await supabase.auth.signUp({
+      email: parsed.data.email,
+      password: parsed.data.password,
+      options: {
+        data: {
+          name: parsed.data.name,
+          role: parsed.data.role,
+        },
       },
-    },
-  });
+    });
 
-  if (error) {
-    return { success: false, error: error.message };
+    if (error) {
+      if (!error.status || error.status >= 500) {
+        console.error("[auth:signUp] Supabase gagal memproses pendaftaran", {
+          code: error.code,
+          status: error.status,
+        });
+        return { success: false, error: "Layanan pendaftaran sedang tidak tersedia. Silakan coba lagi." };
+      }
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, redirectTo: "/login?registered=true" };
+  } catch (error) {
+    console.error("[auth:signUp] Pendaftaran gagal", {
+      stage,
+      name: error instanceof Error ? error.name : "UnknownError",
+    });
+    return { success: false, error: "Layanan pendaftaran sedang tidak tersedia. Silakan coba lagi." };
   }
-
-  redirect("/login?registered=true");
 }
 
 export async function signOut(): Promise<void> {

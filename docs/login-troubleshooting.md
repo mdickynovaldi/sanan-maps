@@ -38,3 +38,19 @@ Patch mengembalikan hasil login beserta tujuan dashboard sebagai data, sehingga 
 - `npm run build` lulus, termasuk kompilasi produksi, pemeriksaan tipe/lint, dan pembuatan 35 halaman statis.
 
 Login berhasil dengan akun asli belum diuji. Perbaikan lokal belum dideploy ke Vercel.
+
+## Register: laporan GET 404 dan POST 500
+
+Pengguna melaporkan kegagalan register di `kampungsanan.com`, dengan request GET 404 dan POST 500. URL GET yang kemudian diberikan adalah `cache.agilebits.com/.../richicons/images/login/120/kampungsanan.com.png`, yaitu permintaan ikon dari 1Password, bukan proses pendaftaran aplikasi. [Dokumentasi 1Password](https://support.1password.com/rich-icons-privacy/) mengonfirmasi fungsi domain cache tersebut. Pada pemeriksaan ulang, `/register` dan 17 aset statis yang dirujuk halaman memberi HTTP 200. Bundle register live masih memakai penanganan submit lama.
+
+Form register memiliki masalah loading yang sama dengan login: exception Server Action tidak tertangkap. Patch register menambahkan `try/catch/finally`, batas waktu Supabase 10 detik per request, serta log `[auth:signUp]` dengan tahap kegagalan. Nama dan email dinormalisasi dengan menghapus spasi di awal/akhir. Pendaftaran yang berhasil mengembalikan tujuan `/login?registered=true`; halaman login menampilkan pemberitahuan keberhasilan dan instruksi konfirmasi email bila diperlukan.
+
+Verifikasi tambahan:
+
+- 16 pemeriksaan regresi register lulus, termasuk validasi role user/owner, penolakan role admin, email/password, batas percobaan, exception Redis/env, error jaringan/database, serta pemulihan loading dan navigasi.
+- Pada browser dengan layanan Supabase simulasi lokal, form kosong menampilkan validasi; email duplikat menampilkan error; respons database HTTP 500 dan timeout menghasilkan pesan error dengan tombol kembali aktif.
+- Simulasi pendaftaran owner berhasil meneruskan role yang benar dan membuka halaman login dengan pemberitahuan keberhasilan.
+- Build produksi, TypeScript, dan ESLint lulus setelah perubahan register; 16 pemeriksaan login sebelumnya tetap lulus.
+- Tidak ada akun produksi yang dibuat dalam pengujian ini. Keberhasilan simulasi tidak membuktikan pendaftaran di database produksi sudah pulih.
+
+Untuk akar masalah produksi, periksa **Vercel → proyek kampungsanan.com → Logs → POST /register** dan salin pesan exception. Log yang diberikan sejauh ini masih berupa pesan generik console browser, sehingga akar exception belum diketahui. Bila patch sudah dideploy, tahap `rate-limit`, `supabase-client`, atau `signup` membantu membedakan kegagalan Upstash, konfigurasi env, dan respons Supabase. Status 500 di DevTools saja belum cukup untuk menentukan perbaikan konfigurasi atau database.

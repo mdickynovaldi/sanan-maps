@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ type FieldErrors = {
 };
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [role, setRole] = useState<"user" | "owner">("user");
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -36,6 +38,7 @@ export default function RegisterPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (loading) return;
     setError(null);
     setFieldErrors({});
 
@@ -64,10 +67,17 @@ export default function RegisterPage() {
     }
 
     setLoading(true);
-    const result = await signUp(formData);
-
-    if (result && !result.success) {
-      setError(result.error ?? "Pendaftaran gagal");
+    try {
+      const result = await signUp(formData);
+      if (!result.success) {
+        setError(result.error ?? "Pendaftaran gagal");
+        return;
+      }
+      router.replace(result.redirectTo ?? "/login?registered=true");
+      router.refresh();
+    } catch {
+      setError("Tidak dapat menghubungi server pendaftaran. Silakan coba lagi.");
+    } finally {
       setLoading(false);
     }
   }
