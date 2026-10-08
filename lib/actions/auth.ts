@@ -9,6 +9,7 @@ import { checkRateLimit } from "@/lib/rate-limit";
 export type ActionResult = {
   success: boolean;
   error?: string;
+  redirectTo?: string;
 };
 
 async function getClientIp(): Promise<string> {
@@ -40,43 +41,64 @@ export async function signIn(formData: FormData): Promise<ActionResult> {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Input tidak valid" };
   }
 
-  // Rate limit: 5 percobaan per menit per IP
-  const ip = await getClientIp();
-  const rl = await checkRateLimit("login", ip, 5, 60);
-  if (!rl.success) {
-    return { success: false, error: "Terlalu banyak percobaan login. Coba lagi dalam 1 menit." };
+  let stage = "rate-limit";
+  try {
+    const ip = await getClientIp();
+    const rl = await checkRateLimit("login", ip, 5, 60);
+    if (!rl.success) {
+      return { success: false, error: "Terlalu banyak percobaan login. Coba lagi dalam 1 menit." };
+    }
+
+    stage = "supabase-client";
+    const supabase = await createClient({ timeoutMs: 10_000 });
+    stage = "password";
+    const { data: signInData, error } = await supabase.auth.signInWithPassword({
+      email: parsed.data.email,
+      password: parsed.data.password,
+    });
+
+    if (error) {
+      if (!error.status || error.status >= 500) {
+        console.error("[auth:signIn] Supabase tidak tersedia", {
+          code: error.code,
+          status: error.status,
+        });
+        return { success: false, error: "Layanan login sedang tidak tersedia. Silakan coba lagi." };
+      }
+      return { success: false, error: error.message };
+    }
+
+    const redirectParam = formData.get("redirect");
+    if (
+      typeof redirectParam === "string" &&
+      redirectParam.startsWith("/") &&
+      !redirectParam.startsWith("//") &&
+      !redirectParam.includes("\\")
+    ) {
+      return { success: true, redirectTo: redirectParam };
+    }
+
+    let destination = "/dashboard/user";
+    if (signInData.user) {
+      stage = "profile";
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", signInData.user.id)
+        .single();
+      const role = (profile as { role?: string } | null)?.role;
+      if (role === "admin") destination = "/dashboard/admin";
+      else if (role === "owner") destination = "/dashboard/owner";
+    }
+
+    return { success: true, redirectTo: destination };
+  } catch (error) {
+    console.error("[auth:signIn] Login gagal", {
+      stage,
+      name: error instanceof Error ? error.name : "UnknownError",
+    });
+    return { success: false, error: "Layanan login sedang tidak tersedia. Silakan coba lagi." };
   }
-
-  const supabase = await createClient();
-  const { data: signInData, error } = await supabase.auth.signInWithPassword({
-    email: parsed.data.email,
-    password: parsed.data.password,
-  });
-
-  if (error) {
-    return { success: false, error: error.message };
-  }
-
-  // Hormati deep-link ?redirect= dari middleware (hanya path internal),
-  // selain itu arahkan ke dashboard sesuai role akun.
-  const redirectParam = formData.get("redirect");
-  if (typeof redirectParam === "string" && redirectParam.startsWith("/") && !redirectParam.startsWith("//")) {
-    redirect(redirectParam);
-  }
-
-  let destination = "/dashboard/user";
-  if (signInData.user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", signInData.user.id)
-      .single();
-    const role = (profile as { role?: string } | null)?.role;
-    if (role === "admin") destination = "/dashboard/admin";
-    else if (role === "owner") destination = "/dashboard/owner";
-  }
-
-  redirect(destination);
 }
 
 export async function signUp(formData: FormData): Promise<ActionResult> {

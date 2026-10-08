@@ -1,5 +1,7 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+Panduan pemulihan env dan pemeriksaan login tersedia di [docs/login-troubleshooting.md](docs/login-troubleshooting.md).
+
 ## Getting Started
 
 First, run the development server:

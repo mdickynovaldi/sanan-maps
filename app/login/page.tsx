@@ -39,6 +39,7 @@ function LoginPageInner() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (loading) return;
     setError(null);
     setFieldErrors({});
 
@@ -61,13 +62,19 @@ function LoginPageInner() {
     }
 
     setLoading(true);
-    const result = await signIn(formData);
-
-    if (result && !result.success) {
-      setError(result.error ?? "Login gagal");
+    try {
+      const result = await signIn(formData);
+      if (!result.success) {
+        setError(result.error ?? "Login gagal");
+        return;
+      }
+      router.replace(result.redirectTo ?? "/dashboard");
+      router.refresh();
+    } catch {
+      setError("Tidak dapat menghubungi server login. Silakan coba lagi.");
+    } finally {
       setLoading(false);
     }
-    // If success, signIn redirects to /dashboard/user
   }
 
   const errorId = error ? "login-form-error" : undefined;
